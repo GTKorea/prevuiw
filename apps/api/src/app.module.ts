@@ -7,6 +7,7 @@ import { VersionModule } from './version/version.module';
 import { CommentModule } from './comment/comment.module';
 import { ReactionModule } from './reaction/reaction.module';
 import { ScreenshotModule } from './screenshot/screenshot.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ScreenshotModule } from './screenshot/screenshot.module';
     CommentModule,
     ReactionModule,
     ScreenshotModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}
