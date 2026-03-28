@@ -1,0 +1,17 @@
+{
+  "name": "prevuiw",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["@nestjs/core", "@prisma/client", "@prisma/engines", "prisma"]
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @prevuiw/api dev",
+    "build:api": "pnpm --filter @prevuiw/api build",
+    "test:api": "pnpm --filter @prevuiw/api test",
+    "test:api:e2e": "pnpm --filter @prevuiw/api test:e2e",
+    "db:migrate": "pnpm --filter @prevuiw/api db:migrate",
+    "db:generate": "pnpm --filter @prevuiw/api db:generate",
+    "db:push": "pnpm --filter @prevuiw/api db:push",
+    "db:studio": "pnpm --filter @prevuiw/api db:studio"
+  }
+}
