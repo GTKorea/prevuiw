@@ -6,6 +6,7 @@ import { ProjectModule } from './project/project.module';
 import { VersionModule } from './version/version.module';
 import { CommentModule } from './comment/comment.module';
 import { ReactionModule } from './reaction/reaction.module';
+import { ScreenshotModule } from './screenshot/screenshot.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ReactionModule } from './reaction/reaction.module';
     VersionModule,
     CommentModule,
     ReactionModule,
+    ScreenshotModule,
   ],
 })
 export class AppModule {}
