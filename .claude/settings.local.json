@@ -21,7 +21,11 @@
       "Bash(ls:*)",
       "Bash(grep '\"\"date-fns\"\"' package.json)",
       "Skill(browse)",
-      "Skill(design-consultation)"
+      "Skill(design-consultation)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
+      "Bash($B goto:*)",
+      "Bash($B screenshot:*)",
+      "Bash($B scroll:*)"
     ]
   }
 }

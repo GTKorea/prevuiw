@@ -34,15 +34,50 @@ export default function Home() {
       </section>
 
       {/* Problem → Solution bridge */}
-      <section className="py-20 px-4">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Screenshots in Slack. &quot;Check the button on the left.&quot;
-            Feedback lost in threads.
-          </p>
-          <p className="text-lg text-foreground font-medium mt-4">
-            There&apos;s a better way.
-          </p>
+      <section className="py-16 px-4 border-t border-border/40">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* The old way */}
+            <div className="border border-red-500/10 bg-red-500/[0.02] rounded-xl p-6">
+              <p className="text-xs text-red-400/60 font-mono mb-3">The old way</p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="text-muted-foreground/40 mt-0.5">1.</span>
+                  <p className="text-sm text-muted-foreground">Take a screenshot</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-muted-foreground/40 mt-0.5">2.</span>
+                  <p className="text-sm text-muted-foreground">Draw arrows in a markup tool</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-muted-foreground/40 mt-0.5">3.</span>
+                  <p className="text-sm text-muted-foreground">Post in Slack with a paragraph of context</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-muted-foreground/40 mt-0.5">4.</span>
+                  <p className="text-sm text-muted-foreground">Feedback gets buried in threads</p>
+                </div>
+              </div>
+            </div>
+            {/* The prevuiw way */}
+            <div className="border border-blue-500/15 bg-blue-500/[0.02] rounded-xl p-6">
+              <p className="text-xs text-blue-400/60 font-mono mb-3">With prevuiw</p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="text-blue-500 mt-0.5">1.</span>
+                  <p className="text-sm text-foreground/80">Paste a URL</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-blue-500 mt-0.5">2.</span>
+                  <p className="text-sm text-foreground/80">Click directly on the live site to comment</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-blue-500 mt-0.5">3.</span>
+                  <p className="text-sm text-foreground/80">Everyone sees feedback in context, in real time</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
