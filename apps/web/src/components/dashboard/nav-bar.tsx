@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-// Add a notification bell placeholder (Task 7 will fill it in)
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 
 export function NavBar() {
   const { user, logout } = useAuth();
@@ -16,8 +16,7 @@ export function NavBar() {
           <span className="text-sm text-muted-foreground">Dashboard</span>
         </div>
         <div className="flex items-center gap-3">
-          {/* Notification bell placeholder */}
-          <div className="text-muted-foreground text-sm">🔔</div>
+          {user && <NotificationBell />}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger>
