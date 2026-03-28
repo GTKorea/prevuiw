@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/hjick/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.6/skills/brainstorming/scripts/start-server.sh --project-dir /Users/hjick/Documents/applications/krow-tools/prevuiw)",
+      "Bash(pnpm install:*)",
+      "Bash(cd:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm:*)",
+      "Bash(npx nest:*)",
+      "Bash(git:*)",
+      "Bash(pg_isready -h localhost -p 5432)",
+      "Bash(npx prisma:*)",
+      "Bash(psql -U postgres -h localhost -c \"\\\\l\")",
+      "Bash(psql -h localhost -c \"\\\\du\")",
+      "Bash(psql postgres:*)",
+      "Bash(npx jest:*)",
+      "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw/node_modules/.pnpm -name index.d.ts -path */socket.io/*)",
+      "Bash(pkill -f \"create next-app\")",
+      "Bash(pkill -f \"create-next-app\")",
+      "Bash(npx shadcn@latest add button input dialog card badge avatar dropdown-menu tooltip textarea popover scroll-area separator --yes)",
+      "Bash(ls:*)",
+      "Bash(grep '\"\"date-fns\"\"' package.json)",
+      "Skill(browse)"
+    ]
+  }
+}
