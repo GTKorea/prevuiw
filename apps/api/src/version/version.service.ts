@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { UrlType } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateVersionDto } from './dto/version.dto';
+import { validateExternalUrl } from '@/common/utils/url-validator';
 
 const IMMUTABLE_PATTERNS = [
   /^https:\/\/[\w-]+-[\w]{6,}\.vercel\.app/,       // Vercel
@@ -21,6 +22,8 @@ export class VersionService {
   }
 
   async create(projectId: string, userId: string, dto: CreateVersionDto) {
+    validateExternalUrl(dto.url);
+
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
     });

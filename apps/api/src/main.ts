@@ -2,6 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
+const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`ERROR: ${envVar} environment variable is required`);
+    process.exit(1);
+  }
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

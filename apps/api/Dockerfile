@@ -33,4 +33,8 @@ RUN npx playwright install chromium
 ENV NODE_ENV=production
 EXPOSE 3012
 
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 app
+USER app
+
 CMD ["node", "dist/main"]

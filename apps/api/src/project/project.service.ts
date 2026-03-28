@@ -12,7 +12,7 @@ export class ProjectService {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
-    const suffix = randomBytes(3).toString('hex');
+    const suffix = randomBytes(8).toString('hex');
     return `${base}-${suffix}`;
   }
 

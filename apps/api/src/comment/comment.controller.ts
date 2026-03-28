@@ -8,6 +8,7 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { OptionalAuthGuard } from '@/auth/guards/optional-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
@@ -24,6 +25,7 @@ export class CommentController {
 
   @Post()
   @UseGuards(OptionalAuthGuard)
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   async create(
     @Param('versionId') versionId: string,
     @CurrentUser() user: any,
@@ -39,6 +41,7 @@ export class CommentController {
   }
 
   @Get()
+  @SkipThrottle()
   findAll(@Param('versionId') versionId: string) {
     return this.commentService.findAllByVersion(versionId);
   }

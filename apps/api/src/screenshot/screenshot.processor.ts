@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { validateExternalUrl } from '@/common/utils/url-validator';
 
 const VIEWPORTS = [
   { name: 'MOBILE_375', width: 375, height: 812 },
@@ -12,6 +13,8 @@ export class ScreenshotProcessor {
   private readonly logger = new Logger(ScreenshotProcessor.name);
 
   async captureAll(url: string): Promise<Array<{ viewport: string; buffer: Buffer }>> {
+    validateExternalUrl(url);
+
     // Dynamically import playwright to avoid issues if not installed
     const { chromium } = await import('playwright');
     let browser = null;

@@ -1,3 +1,4 @@
+# TODO: Pin third-party actions to SHA hashes for production
 name: Deploy API
 
 on:

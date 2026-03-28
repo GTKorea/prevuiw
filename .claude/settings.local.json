@@ -20,7 +20,8 @@
       "Bash(npx shadcn@latest add button input dialog card badge avatar dropdown-menu tooltip textarea popover scroll-area separator --yes)",
       "Bash(ls:*)",
       "Bash(grep '\"\"date-fns\"\"' package.json)",
-      "Skill(browse)"
+      "Skill(browse)",
+      "Skill(design-consultation)"
     ]
   }
 }
