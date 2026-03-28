@@ -14,16 +14,34 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
+
       {/* Hero */}
-      <section className="flex min-h-[70vh] flex-col items-center justify-center px-4 pt-14">
-        <div className="flex w-full max-w-xl flex-col items-center gap-6">
-          <h1 className="text-4xl font-bold tracking-tight">prevuiw</h1>
-          <p className="text-muted-foreground text-sm">
-            Paste your URL. Get instant team feedback.
+      <section className="flex min-h-[85vh] flex-col items-center justify-center px-4 pt-14">
+        <div className="flex w-full max-w-2xl flex-col items-center gap-6 text-center">
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
+            Review any website,<br />together.
+          </h1>
+          <p className="text-muted-foreground text-base max-w-lg leading-relaxed">
+            Your team reviews Figma designs with pinned comments.
+            Do the same for live websites. Paste a URL, share the link,
+            get visual feedback in seconds.
           </p>
           <UrlInput />
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-xs text-muted-foreground/50">
             No sign-up required for your first preview
+          </p>
+        </div>
+      </section>
+
+      {/* Problem → Solution bridge */}
+      <section className="py-20 px-4">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Screenshots in Slack. &quot;Check the button on the left.&quot;
+            Feedback lost in threads.
+          </p>
+          <p className="text-lg text-foreground font-medium mt-4">
+            There&apos;s a better way.
           </p>
         </div>
       </section>
