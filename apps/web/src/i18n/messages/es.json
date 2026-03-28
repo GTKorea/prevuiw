@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "title": "prevuiw",
+    "subtitle": "Pega tu URL. Recibe comentarios del equipo al instante.",
+    "placeholder": "https://your-app.vercel.app",
+    "submit": "Vista previa →",
+    "noSignup": "No es necesario registrarse para tu primera vista previa",
+    "signIn": "Iniciar sesión",
+    "docs": "Documentación"
+  },
+  "dashboard": {
+    "title": "Mis proyectos",
+    "newProject": "+ Nuevo proyecto",
+    "noProjects": "Aún no hay proyectos. ¡Crea uno para comenzar!",
+    "loading": "Cargando...",
+    "versions": "versiones",
+    "version": "versión"
+  },
+  "version": {
+    "title": "Historial de versiones",
+    "newVersion": "+ Nueva versión",
+    "noVersions": "Aún no hay versiones. ¡Agrega tu primera versión!",
+    "live": "EN VIVO",
+    "open": "Abrir",
+    "view": "Ver",
+    "versionName": "Nombre de versión",
+    "url": "URL",
+    "memo": "Nota de versión (opcional)",
+    "create": "Crear versión",
+    "creating": "Creando..."
+  },
+  "review": {
+    "comments": "comentarios",
+    "online": "en línea",
+    "share": "Compartir",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "allComments": "Todos",
+    "openComments": "Abiertos",
+    "resolvedComments": "Resueltos",
+    "reply": "Responder",
+    "resolve": "Resolver",
+    "unresolve": "Marcar sin resolver",
+    "addComment": "Agregar un comentario...",
+    "send": "Enviar",
+    "cancel": "Cancelar"
+  },
+  "auth": {
+    "signingIn": "Iniciando sesión...",
+    "signOut": "Cerrar sesión"
+  },
+  "guest": {
+    "title": "Ingresa tu nombre",
+    "description": "Elige un nombre para mostrar y dejar comentarios",
+    "placeholder": "Tu nombre",
+    "continue": "Continuar"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "empty": "Sin notificaciones aún",
+    "mentioned": "te mencionó",
+    "replied": "respondió a tu comentario",
+    "resolved": "resolvió tu comentario"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  }
+}

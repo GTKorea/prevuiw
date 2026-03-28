@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "title": "prevuiw",
+    "subtitle": "URL을 붙여넣으세요. 팀 피드백을 바로 받으세요.",
+    "placeholder": "https://your-app.vercel.app",
+    "submit": "프리뷰 →",
+    "noSignup": "첫 프리뷰는 회원가입 없이 가능합니다",
+    "signIn": "로그인",
+    "docs": "문서"
+  },
+  "dashboard": {
+    "title": "내 프로젝트",
+    "newProject": "+ 새 프로젝트",
+    "noProjects": "아직 프로젝트가 없습니다. 새로 만들어보세요!",
+    "loading": "로딩 중...",
+    "versions": "버전",
+    "version": "버전"
+  },
+  "version": {
+    "title": "버전 히스토리",
+    "newVersion": "+ 새 버전",
+    "noVersions": "아직 버전이 없습니다. 첫 버전을 추가해보세요!",
+    "live": "LIVE",
+    "open": "열기",
+    "view": "보기",
+    "versionName": "버전 이름",
+    "url": "URL",
+    "memo": "버전 메모 (선택사항)",
+    "create": "버전 생성",
+    "creating": "생성 중..."
+  },
+  "review": {
+    "comments": "댓글",
+    "online": "온라인",
+    "share": "공유",
+    "copyLink": "링크 복사",
+    "copied": "복사됨!",
+    "allComments": "전체",
+    "openComments": "열림",
+    "resolvedComments": "해결됨",
+    "reply": "답글",
+    "resolve": "해결",
+    "unresolve": "해결 취소",
+    "addComment": "댓글을 남겨보세요...",
+    "send": "전송",
+    "cancel": "취소"
+  },
+  "auth": {
+    "signingIn": "로그인 중...",
+    "signOut": "로그아웃"
+  },
+  "guest": {
+    "title": "이름을 입력하세요",
+    "description": "댓글을 남기기 위한 닉네임을 설정하세요",
+    "placeholder": "닉네임",
+    "continue": "계속"
+  },
+  "notifications": {
+    "title": "알림",
+    "markAllRead": "모두 읽음 처리",
+    "empty": "알림이 없습니다",
+    "mentioned": "님이 회원님을 멘션했습니다",
+    "replied": "님이 댓글에 답글을 남겼습니다",
+    "resolved": "님이 댓글을 해결했습니다"
+  },
+  "theme": {
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  }
+}

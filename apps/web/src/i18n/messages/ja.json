@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "title": "prevuiw",
+    "subtitle": "URLを貼り付けて、チームのフィードバックを即座に受け取りましょう。",
+    "placeholder": "https://your-app.vercel.app",
+    "submit": "プレビュー →",
+    "noSignup": "初回プレビューはサインアップ不要です",
+    "signIn": "サインイン",
+    "docs": "ドキュメント"
+  },
+  "dashboard": {
+    "title": "マイプロジェクト",
+    "newProject": "+ 新しいプロジェクト",
+    "noProjects": "プロジェクトがありません。作成してみましょう！",
+    "loading": "読み込み中...",
+    "versions": "バージョン",
+    "version": "バージョン"
+  },
+  "version": {
+    "title": "バージョン履歴",
+    "newVersion": "+ 新しいバージョン",
+    "noVersions": "バージョンがありません。最初のバージョンを追加しましょう！",
+    "live": "LIVE",
+    "open": "開く",
+    "view": "表示",
+    "versionName": "バージョン名",
+    "url": "URL",
+    "memo": "バージョンメモ（任意）",
+    "create": "バージョンを作成",
+    "creating": "作成中..."
+  },
+  "review": {
+    "comments": "コメント",
+    "online": "オンライン",
+    "share": "共有",
+    "copyLink": "リンクをコピー",
+    "copied": "コピーしました！",
+    "allComments": "すべて",
+    "openComments": "未解決",
+    "resolvedComments": "解決済み",
+    "reply": "返信",
+    "resolve": "解決",
+    "unresolve": "未解決に戻す",
+    "addComment": "コメントを追加...",
+    "send": "送信",
+    "cancel": "キャンセル"
+  },
+  "auth": {
+    "signingIn": "サインイン中...",
+    "signOut": "サインアウト"
+  },
+  "guest": {
+    "title": "名前を入力してください",
+    "description": "コメントを残すための表示名を設定してください",
+    "placeholder": "表示名",
+    "continue": "続ける"
+  },
+  "notifications": {
+    "title": "通知",
+    "markAllRead": "すべて既読にする",
+    "empty": "通知はありません",
+    "mentioned": "さんがあなたをメンションしました",
+    "replied": "さんがコメントに返信しました",
+    "resolved": "さんがコメントを解決しました"
+  },
+  "theme": {
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  }
+}

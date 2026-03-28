@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "title": "prevuiw",
+    "subtitle": "Collez votre URL. Obtenez des retours d'équipe instantanément.",
+    "placeholder": "https://your-app.vercel.app",
+    "submit": "Aperçu →",
+    "noSignup": "Aucune inscription requise pour votre premier aperçu",
+    "signIn": "Se connecter",
+    "docs": "Documentation"
+  },
+  "dashboard": {
+    "title": "Mes projets",
+    "newProject": "+ Nouveau projet",
+    "noProjects": "Aucun projet pour l'instant. Créez-en un pour commencer !",
+    "loading": "Chargement...",
+    "versions": "versions",
+    "version": "version"
+  },
+  "version": {
+    "title": "Historique des versions",
+    "newVersion": "+ Nouvelle version",
+    "noVersions": "Aucune version pour l'instant. Ajoutez votre première version !",
+    "live": "EN LIGNE",
+    "open": "Ouvrir",
+    "view": "Voir",
+    "versionName": "Nom de la version",
+    "url": "URL",
+    "memo": "Note de version (optionnel)",
+    "create": "Créer la version",
+    "creating": "Création en cours..."
+  },
+  "review": {
+    "comments": "commentaires",
+    "online": "en ligne",
+    "share": "Partager",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !",
+    "allComments": "Tous",
+    "openComments": "Ouverts",
+    "resolvedComments": "Résolus",
+    "reply": "Répondre",
+    "resolve": "Résoudre",
+    "unresolve": "Marquer non résolu",
+    "addComment": "Ajouter un commentaire...",
+    "send": "Envoyer",
+    "cancel": "Annuler"
+  },
+  "auth": {
+    "signingIn": "Connexion en cours...",
+    "signOut": "Se déconnecter"
+  },
+  "guest": {
+    "title": "Entrez votre nom",
+    "description": "Choisissez un nom d'affichage pour laisser des commentaires",
+    "placeholder": "Votre nom",
+    "continue": "Continuer"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": "Aucune notification pour l'instant",
+    "mentioned": "vous a mentionné",
+    "replied": "a répondu à votre commentaire",
+    "resolved": "a résolu votre commentaire"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  }
+}

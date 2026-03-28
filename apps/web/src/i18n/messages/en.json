@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "title": "prevuiw",
+    "subtitle": "Paste your URL. Get instant team feedback.",
+    "placeholder": "https://your-app.vercel.app",
+    "submit": "Preview →",
+    "noSignup": "No sign-up required for your first preview",
+    "signIn": "Sign in",
+    "docs": "Docs"
+  },
+  "dashboard": {
+    "title": "My Projects",
+    "newProject": "+ New Project",
+    "noProjects": "No projects yet. Create one to get started!",
+    "loading": "Loading...",
+    "versions": "versions",
+    "version": "version"
+  },
+  "version": {
+    "title": "Version History",
+    "newVersion": "+ New Version",
+    "noVersions": "No versions yet. Add your first version!",
+    "live": "LIVE",
+    "open": "Open",
+    "view": "View",
+    "versionName": "Version name",
+    "url": "URL",
+    "memo": "Version memo (optional)",
+    "create": "Create Version",
+    "creating": "Creating..."
+  },
+  "review": {
+    "comments": "comments",
+    "online": "online",
+    "share": "Share",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "allComments": "All",
+    "openComments": "Open",
+    "resolvedComments": "Resolved",
+    "reply": "Reply",
+    "resolve": "Resolve",
+    "unresolve": "Unresolve",
+    "addComment": "Add a comment...",
+    "send": "Send",
+    "cancel": "Cancel"
+  },
+  "auth": {
+    "signingIn": "Signing in...",
+    "signOut": "Sign out"
+  },
+  "guest": {
+    "title": "Enter your name",
+    "description": "Choose a display name to leave comments",
+    "placeholder": "Your name",
+    "continue": "Continue"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications yet",
+    "mentioned": "mentioned you",
+    "replied": "replied to your comment",
+    "resolved": "resolved your comment"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
