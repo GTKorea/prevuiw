@@ -17,7 +17,7 @@ const LOCALE_LABELS: Record<Locale, string> = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3012";
 
 export function Header() {
-  const { locale, setLocale } = useI18n();
+  const { locale, setLocale, t } = useI18n();
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
 
@@ -42,13 +42,13 @@ export function Header() {
             href="#features"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
           >
-            Features
+            {t("landing.features")}
           </Link>
           <Link
             href="#platforms"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
           >
-            Platforms
+            {t("landing.platforms")}
           </Link>
 
           {/* Language selector */}
@@ -94,7 +94,7 @@ export function Header() {
             href={`${API_URL}/auth/google`}
             className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
           >
-            Sign in
+            {t("landing.signIn")}
           </Link>
         </div>
       </div>

@@ -1,13 +1,18 @@
+"use client";
+
+import { useI18n } from "@/i18n/context";
+
 export function DemoMockup() {
+  const { t } = useI18n();
+
   return (
     <section className="py-24">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
-          See it in action
+          {t("landing.demoTitle")}
         </h2>
         <p className="text-sm text-muted-foreground text-center mb-12">
-          Your team reviews directly on the live site — no screenshots, no
-          guessing.
+          {t("landing.demoSubtitle")}
         </p>
 
         {/* Review page mockup */}

@@ -1,12 +1,18 @@
+"use client";
+
+import { useI18n } from "@/i18n/context";
+
 export function HowItWorks() {
+  const { t } = useI18n();
+
   return (
     <section className="py-24">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
-          How it works
+          {t("landing.howItWorksTitle")}
         </h2>
         <p className="text-sm text-muted-foreground text-center mb-16 max-w-lg mx-auto">
-          Three steps. No setup. No installs.
+          {t("landing.howItWorksSubtitle")}
         </p>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -25,9 +31,9 @@ export function HowItWorks() {
             </div>
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">01</p>
-              <h3 className="text-base font-semibold mb-1.5">Paste your URL</h3>
+              <h3 className="text-base font-semibold mb-1.5">{t("landing.step1Title")}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Any deployment URL. Vercel, Netlify, localhost tunnels.
+                {t("landing.step1Desc")}
               </p>
             </div>
           </div>
@@ -52,9 +58,9 @@ export function HowItWorks() {
             </div>
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">02</p>
-              <h3 className="text-base font-semibold mb-1.5">Share the link</h3>
+              <h3 className="text-base font-semibold mb-1.5">{t("landing.step2Title")}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Send to your team. No account needed to review.
+                {t("landing.step2Desc")}
               </p>
             </div>
           </div>
@@ -77,9 +83,9 @@ export function HowItWorks() {
             </div>
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">03</p>
-              <h3 className="text-base font-semibold mb-1.5">Get feedback</h3>
+              <h3 className="text-base font-semibold mb-1.5">{t("landing.step3Title")}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Click anywhere on the live page to leave pinned comments.
+                {t("landing.step3Desc")}
               </p>
             </div>
           </div>

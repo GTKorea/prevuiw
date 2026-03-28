@@ -1,4 +1,7 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/i18n/context";
 
 const platforms = [
   { name: "Vercel", desc: "Deploy previews" },
@@ -9,15 +12,16 @@ const platforms = [
 ];
 
 export function Platforms() {
+  const { t } = useI18n();
+
   return (
     <section id="platforms" className="py-24 scroll-mt-14">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
-          Works with your deployment platform
+          {t("landing.platformsTitle")}
         </h2>
         <p className="text-sm text-muted-foreground text-center mb-12 max-w-lg mx-auto">
-          Every platform that gives you immutable deployment URLs works perfectly.
-          Your review links stay valid forever.
+          {t("landing.platformsSubtitle")}
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
@@ -37,8 +41,7 @@ export function Platforms() {
             <Badge variant="secondary" className="text-xs">+ Any URL</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            Non-immutable URLs work too. When you deploy a new version, we automatically
-            capture screenshots of the previous version for permanent reference.
+            {t("landing.platformsAnyUrl")}
           </p>
         </div>
       </div>

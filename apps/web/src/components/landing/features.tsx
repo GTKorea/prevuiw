@@ -1,9 +1,15 @@
+"use client";
+
+import { useI18n } from "@/i18n/context";
+
 export function Features() {
+  const { t } = useI18n();
+
   return (
     <section id="features" className="py-24 scroll-mt-14">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-16">
-          Built for visual feedback
+          {t("landing.featuresTitle")}
         </h2>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -34,11 +40,10 @@ export function Features() {
             </div>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-1">
-                Click or drag to comment
+                {t("landing.feature1Title")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Pin comments to exact pixels, or drag to highlight an
-                area. No more &quot;the thing on the left.&quot;
+                {t("landing.feature1Desc")}
               </p>
             </div>
           </div>
@@ -65,10 +70,9 @@ export function Features() {
               </div>
             </div>
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-1">Version control</h3>
+              <h3 className="text-lg font-semibold mb-1">{t("landing.feature2Title")}</h3>
               <p className="text-sm text-muted-foreground">
-                Track every deployment. Compare versions side by side. Comments
-                stay attached to their version.
+                {t("landing.feature2Desc")}
               </p>
             </div>
           </div>
@@ -110,11 +114,10 @@ export function Features() {
             </div>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-1">
-                Real-time collaboration
+                {t("landing.feature3Title")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                See who&apos;s viewing. Comments appear instantly for everyone.
-                No refresh needed.
+                {t("landing.feature3Desc")}
               </p>
             </div>
           </div>
@@ -135,11 +138,10 @@ export function Features() {
             </div>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-1">
-                No sign-up required
+                {t("landing.feature4Title")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Reviewers just enter their name and start commenting. Zero
-                friction for your team.
+                {t("landing.feature4Desc")}
               </p>
             </div>
           </div>
