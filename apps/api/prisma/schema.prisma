@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  GOOGLE
+  GITHUB
+}
+
+enum UrlType {
+  IMMUTABLE
+  MUTABLE
+}
+
+enum Viewport {
+  MOBILE_375
+  TABLET_768
+  LAPTOP_1440
+  DESKTOP_1920
+}
+
+enum NotificationType {
+  MENTION
+  REPLY
+  RESOLVE
+}
+
+model User {
+  id         String       @id @default(uuid()) @db.Uuid
+  email      String       @unique
+  name       String
+  avatarUrl  String?
+  provider   AuthProvider
+  providerId String
+  createdAt  DateTime     @default(now())
+
+  projects      Project[]
+  comments      Comment[]
+  reactions     Reaction[]
+  notifications Notification[]
+
+  @@unique([provider, providerId])
+  @@map("users")
+}
+
+model Project {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  ownerId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  versions Version[]
+
+  @@map("projects")
+}
+
+model Version {
+  id          String   @id @default(uuid()) @db.Uuid
+  projectId   String   @db.Uuid
+  versionName String
+  url         String
+  memo        String?
+  urlType     UrlType
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  screenshots Screenshot[]
+
+  @@map("versions")
+}
+
+model Comment {
+  id            String   @id @default(uuid()) @db.Uuid
+  versionId     String   @db.Uuid
+  authorId      String?  @db.Uuid
+  guestName     String?
+  content       String
+  posX          Float
+  posY          Float
+  selectionArea Json?
+  parentId      String?  @db.Uuid
+  isResolved    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  version  Version   @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  author   User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  parent   Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentThread")
+
+  reactions     Reaction[]
+  notifications Notification[]
+
+  @@map("comments")
+}
+
+model Reaction {
+  id        String @id @default(uuid()) @db.Uuid
+  commentId String @db.Uuid
+  userId    String @db.Uuid
+  emoji     String
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+  @@map("reactions")
+}
+
+model Screenshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  versionId  String   @db.Uuid
+  viewport   Viewport
+  imageUrl   String
+  capturedAt DateTime @default(now())
+
+  version Version @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@map("screenshots")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  commentId String           @db.Uuid
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
