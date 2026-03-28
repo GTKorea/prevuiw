@@ -1,4 +1,5 @@
 import { UrlInput } from "@/components/landing/url-input";
+import { Header } from "@/components/landing/header";
 import { DemoMockup } from "@/components/landing/demo-mockup";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Features } from "@/components/landing/features";
@@ -12,8 +13,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      <Header />
       {/* Hero */}
-      <section className="flex min-h-[70vh] flex-col items-center justify-center px-4">
+      <section className="flex min-h-[70vh] flex-col items-center justify-center px-4 pt-14">
         <div className="flex w-full max-w-xl flex-col items-center gap-6">
           <h1 className="text-4xl font-bold tracking-tight">prevuiw</h1>
           <p className="text-muted-foreground text-sm">
