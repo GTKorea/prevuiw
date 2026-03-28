@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useI18n } from "@/i18n/context";
 import type { Locale } from "@/i18n/config";
@@ -17,6 +18,18 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3012";
 
 export function Header() {
   const { locale, setLocale } = useI18n();
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
@@ -39,8 +52,11 @@ export function Header() {
           </Link>
 
           {/* Language selector */}
-          <div className="relative group">
-            <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <div className="relative" ref={langRef}>
+            <button
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M2 12h20" />
@@ -48,25 +64,30 @@ export function Header() {
               </svg>
               <span className="text-xs">{LOCALE_LABELS[locale]}</span>
             </button>
-            <div className="absolute right-0 top-full mt-2 hidden group-hover:block">
-              <div className="bg-neutral-900 border border-border/60 rounded-lg py-1 shadow-xl min-w-[100px]">
-                {(Object.entries(LOCALE_LABELS) as [Locale, string][]).map(
-                  ([code, label]) => (
-                    <button
-                      key={code}
-                      onClick={() => setLocale(code)}
-                      className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${
-                        locale === code
-                          ? "text-foreground bg-neutral-800"
-                          : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/50"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  )
-                )}
+            {langOpen && (
+              <div className="absolute right-0 top-full mt-2">
+                <div className="bg-neutral-900 border border-border/60 rounded-lg py-1 shadow-xl min-w-[100px]">
+                  {(Object.entries(LOCALE_LABELS) as [Locale, string][]).map(
+                    ([code, label]) => (
+                      <button
+                        key={code}
+                        onClick={() => {
+                          setLocale(code);
+                          setLangOpen(false);
+                        }}
+                        className={`block w-full px-3 py-1.5 text-left text-xs transition-colors ${
+                          locale === code
+                            ? "text-foreground bg-neutral-800"
+                            : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/50"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <Link
