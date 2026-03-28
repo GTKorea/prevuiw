@@ -1,6 +1,6 @@
 export function HowItWorks() {
   return (
-    <section className="py-24 border-t border-border/40">
+    <section className="py-24">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
           How it works

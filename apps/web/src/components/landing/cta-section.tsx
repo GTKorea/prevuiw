@@ -2,7 +2,7 @@ import { UrlInput } from "@/components/landing/url-input";
 
 export function CtaSection() {
   return (
-    <section className="py-32 border-t border-border/40">
+    <section className="py-32">
       <div className="mx-auto max-w-2xl px-4 flex flex-col items-center gap-6 text-center">
         <h2 className="text-4xl font-bold tracking-tight">
           Start reviewing in seconds

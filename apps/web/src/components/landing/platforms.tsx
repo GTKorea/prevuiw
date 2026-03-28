@@ -10,7 +10,7 @@ const platforms = [
 
 export function Platforms() {
   return (
-    <section id="platforms" className="py-24 border-t border-border/40 scroll-mt-14">
+    <section id="platforms" className="py-24 scroll-mt-14">
       <div className="mx-auto max-w-5xl px-4">
         <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
           Works with your deployment platform
