@@ -6,7 +6,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy root workspace files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/api/package.json ./apps/api/
 
 # Install dependencies
@@ -21,6 +21,13 @@ RUN cd apps/api && npx prisma generate
 # Build
 RUN cd apps/api && pnpm build
 
+# Deploy: creates a standalone bundle with all deps resolved
+RUN pnpm deploy --filter @prevuiw/api --prod /app/deployed
+
+# Copy built files into deployed
+RUN cp -r /app/apps/api/dist /app/deployed/dist
+RUN cp -r /app/apps/api/prisma /app/deployed/prisma
+
 FROM node:22-slim AS runner
 
 RUN apt-get update && apt-get install -y \
@@ -32,14 +39,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules ./node_modules
-COPY --from=builder /app/node_modules ./root_modules
-COPY --from=builder /app/apps/api/prisma ./prisma
-COPY --from=builder /app/apps/api/package.json ./
-
-# Merge root node_modules for hoisted deps
-RUN cp -rn ./root_modules/* ./node_modules/ 2>/dev/null || true && rm -rf ./root_modules
+COPY --from=builder /app/deployed ./
 
 RUN npx playwright install chromium
 
