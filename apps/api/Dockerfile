@@ -22,11 +22,14 @@ RUN cd apps/api && npx prisma generate
 RUN cd apps/api && pnpm build
 
 # Deploy: creates a standalone bundle with all deps resolved
-RUN pnpm deploy --filter @prevuiw/api --prod /app/deployed
+RUN pnpm deploy --filter @prevuiw/api --prod --legacy /app/deployed
 
-# Copy built files into deployed
+# Copy built files and schema into deployed
 RUN cp -r /app/apps/api/dist /app/deployed/dist
 RUN cp -r /app/apps/api/prisma /app/deployed/prisma
+
+# Re-generate Prisma client inside deployed bundle
+RUN cd /app/deployed && npx prisma generate
 
 FROM node:22-slim AS runner
 
