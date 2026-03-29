@@ -25,7 +25,9 @@
       "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
       "Bash($B goto:*)",
       "Bash($B screenshot:*)",
-      "Bash($B scroll:*)"
+      "Bash($B scroll:*)",
+      "Bash(psql -U postgres -c l)",
+      "Bash(psql -U hjick -c l)"
     ]
   }
 }

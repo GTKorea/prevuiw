@@ -8,6 +8,10 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
+const oauthProviders = [];
+if (process.env.GOOGLE_CLIENT_ID) oauthProviders.push(GoogleStrategy);
+if (process.env.GITHUB_CLIENT_ID) oauthProviders.push(GithubStrategy);
+
 @Module({
   imports: [
     PassportModule,
@@ -21,7 +25,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, GithubStrategy, JwtStrategy],
+  providers: [AuthService, JwtStrategy, ...oauthProviders],
   exports: [AuthService],
 })
 export class AuthModule {}
