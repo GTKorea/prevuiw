@@ -1,7 +1,17 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { randomBytes } from 'crypto';
+import { UrlType } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
+import { validateExternalUrl } from '@/common/utils/url-validator';
+
+const IMMUTABLE_PATTERNS = [
+  /^https:\/\/[\w-]+-[\w]{6,}\.vercel\.app/,
+  /^https:\/\/[\w]+-{2}[\w-]+\.netlify\.app/,
+  /^https:\/\/[\w]+\.[\w-]+\.pages\.dev/,
+  /^https:\/\/pr-\d+\.[\w-]+\.amplifyapp\.com/,
+  /^https:\/\/[\w-]+-pr-\d+\.onrender\.com/,
+];
 
 @Injectable()
 export class ProjectService {
@@ -16,14 +26,40 @@ export class ProjectService {
     return `${base}-${suffix}`;
   }
 
-  async create(userId: string, dto: CreateProjectDto) {
-    const slug = this.generateSlug(dto.name);
+  private detectUrlType(url: string): UrlType {
+    return IMMUTABLE_PATTERNS.some((p) => p.test(url)) ? UrlType.IMMUTABLE : UrlType.MUTABLE;
+  }
 
-    return this.prisma.project.create({
+  async create(userId: string | null, dto: CreateProjectDto, guest?: { clientIp: string; guestId?: string }) {
+    const isGuest = !userId;
+
+    if (isGuest) {
+      const fingerprint = guest?.guestId || guest?.clientIp || 'unknown';
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentGuestProjects = await this.prisma.project.count({
+        where: {
+          isGuest: true,
+          guestId: fingerprint,
+          createdAt: { gte: oneDayAgo },
+        },
+      });
+
+      if (recentGuestProjects >= 2) {
+        throw new ForbiddenException('Guest users can create up to 2 projects per day. Sign in for unlimited projects.');
+      }
+    }
+
+    const slug = this.generateSlug(dto.name);
+    const expiresAt = isGuest ? new Date(Date.now() + 48 * 60 * 60 * 1000) : null;
+
+    const project = await this.prisma.project.create({
       data: {
         name: dto.name,
         slug,
         ownerId: userId,
+        isGuest,
+        guestId: isGuest ? (guest?.guestId || guest?.clientIp || 'unknown') : null,
+        expiresAt,
       },
       include: {
         _count: {
@@ -31,6 +67,33 @@ export class ProjectService {
         },
       },
     });
+
+    if (dto.url) {
+      validateExternalUrl(dto.url);
+      const version = await this.prisma.version.create({
+        data: {
+          projectId: project.id,
+          versionName: 'v1.0',
+          url: dto.url,
+          urlType: this.detectUrlType(dto.url),
+          isActive: true,
+        },
+        select: { id: true },
+      });
+      return { ...project, firstVersionId: version.id };
+    }
+
+    return project;
+  }
+
+  async cleanupExpiredGuests(): Promise<number> {
+    const result = await this.prisma.project.deleteMany({
+      where: {
+        isGuest: true,
+        expiresAt: { lte: new Date() },
+      },
+    });
+    return result.count;
   }
 
   async findAllByUser(userId: string) {
@@ -82,6 +145,10 @@ export class ProjectService {
 
     if (!project) {
       throw new NotFoundException(`Project with slug "${slug}" not found`);
+    }
+
+    if (project.isGuest && project.expiresAt && project.expiresAt < new Date()) {
+      throw new NotFoundException('This preview has expired. Sign in to create permanent projects.');
     }
 
     return project;

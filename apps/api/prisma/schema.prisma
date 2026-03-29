@@ -49,14 +49,17 @@ model User {
 }
 
 model Project {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   name      String
-  slug      String   @unique
-  ownerId   String   @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  slug      String    @unique
+  ownerId   String?   @db.Uuid
+  isGuest   Boolean   @default(false)
+  guestId   String?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner    User?     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   versions Version[]
 
   @@map("projects")

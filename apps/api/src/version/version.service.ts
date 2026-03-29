@@ -32,6 +32,10 @@ export class VersionService {
       throw new NotFoundException(`Project with id "${projectId}" not found`);
     }
 
+    if (project.isGuest) {
+      throw new ForbiddenException('Guest projects do not support version management. Sign in to add versions.');
+    }
+
     if (project.ownerId !== userId) {
       throw new ForbiddenException('You do not have permission to create a version for this project');
     }

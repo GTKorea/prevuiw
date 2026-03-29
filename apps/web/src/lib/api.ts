@@ -6,6 +6,16 @@ class ApiClient {
     return localStorage.getItem("prevuiw_token");
   }
 
+  private getGuestId(): string {
+    if (typeof window === "undefined") return "";
+    let guestId = localStorage.getItem("prevuiw_guest_id");
+    if (!guestId) {
+      guestId = crypto.randomUUID();
+      localStorage.setItem("prevuiw_guest_id", guestId);
+    }
+    return guestId;
+  }
+
   async fetch<T>(path: string, options: RequestInit = {}): Promise<T> {
     const token = this.getToken();
     const headers: HeadersInit = {
@@ -14,6 +24,10 @@ class ApiClient {
     };
     if (token) {
       (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+    }
+    const guestId = this.getGuestId();
+    if (guestId) {
+      (headers as Record<string, string>)["X-Guest-Id"] = guestId;
     }
 
     const res = await fetch(`${API_URL}${path}`, { ...options, headers });
