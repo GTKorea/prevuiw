@@ -28,8 +28,8 @@ RUN pnpm deploy --filter @prevuiw/api --prod --legacy /app/deployed
 RUN cp -r /app/apps/api/dist /app/deployed/dist
 RUN cp -r /app/apps/api/prisma /app/deployed/prisma
 
-# Re-generate Prisma client inside deployed bundle
-RUN cd /app/deployed && npx prisma generate
+# Copy generated Prisma client from builder
+RUN cp -r /app/apps/api/node_modules/.prisma /app/deployed/node_modules/.prisma
 
 FROM node:22-slim AS runner
 
