@@ -27,7 +27,8 @@
       "Bash($B screenshot:*)",
       "Bash($B scroll:*)",
       "Bash(psql -U postgres -c l)",
-      "Bash(psql -U hjick -c l)"
+      "Bash(psql -U hjick -c l)",
+      "Bash(gh auth:*)"
     ]
   }
 }
