@@ -5,31 +5,30 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copy root workspace files
+# Copy workspace files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/api/package.json ./apps/api/
 
-# Install dependencies
+# Install all dependencies (not --prod, need devDeps for build)
 RUN pnpm install --frozen-lockfile
 
 # Copy API source
 COPY apps/api/ ./apps/api/
 
-# Generate Prisma client
-RUN cd apps/api && npx prisma generate
+# Generate Prisma client + Build
+RUN cd apps/api && npx prisma generate && pnpm build
 
-# Build
-RUN cd apps/api && pnpm build
+# Production install in a clean directory
+RUN mkdir /prod && \
+    cp apps/api/package.json /prod/ && \
+    cp pnpm-lock.yaml /prod/ && \
+    cd /prod && \
+    corepack enable && \
+    pnpm install --prod --ignore-workspace
 
-# Deploy: creates a standalone bundle with all deps resolved
-RUN pnpm deploy --filter @prevuiw/api --prod --legacy /app/deployed
-
-# Copy built files and schema into deployed
-RUN cp -r /app/apps/api/dist /app/deployed/dist
-RUN cp -r /app/apps/api/prisma /app/deployed/prisma
-
-# Copy generated Prisma client from builder (find it wherever pnpm put it)
-RUN find /app -path "*/node_modules/.prisma" -type d | head -1 | xargs -I {} cp -r {} /app/deployed/node_modules/.prisma
+# Copy prisma client to prod node_modules
+RUN cp -r /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma /prod/node_modules/.prisma 2>/dev/null || \
+    find /app -path "*node_modules/.prisma" -type d -exec cp -r {} /prod/node_modules/.prisma \; 2>/dev/null || true
 
 FROM node:22-slim AS runner
 
@@ -42,7 +41,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=builder /app/deployed ./
+
+# Copy prod dependencies + prisma client
+COPY --from=builder /prod/node_modules ./node_modules
+
+# Copy built app + prisma schema
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/package.json ./
 
 RUN npx playwright install chromium
 
