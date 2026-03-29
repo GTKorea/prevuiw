@@ -28,7 +28,8 @@
       "Bash($B scroll:*)",
       "Bash(psql -U postgres -c l)",
       "Bash(psql -U hjick -c l)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch apps/api/.env.development' --prune-empty -- --all)"
     ]
   }
 }
