@@ -1,62 +1,46 @@
-FROM node:22-slim AS builder
+# ── Build stage ──
+FROM node:22-alpine AS builder
 
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copy workspace files
+# Copy workspace root files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY apps/api/package.json ./apps/api/
+COPY apps/api/package.json apps/api/
 
-# Install all dependencies (not --prod, need devDeps for build)
+# Install ALL dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
-# Copy API source
-COPY apps/api/ ./apps/api/
+# Copy source code
+COPY apps/api/ apps/api/
 
-# Generate Prisma client + Build
-RUN cd apps/api && npx prisma generate && pnpm build
+# Generate Prisma client + Build API
+RUN cd apps/api && npx prisma generate
+RUN pnpm --filter @prevuiw/api build
 
-# Production install in a clean directory
-RUN mkdir /prod && \
-    cp apps/api/package.json /prod/ && \
-    cp pnpm-lock.yaml /prod/ && \
-    cd /prod && \
-    corepack enable && \
-    pnpm install --prod --ignore-workspace
+# ── Production stage ──
+FROM node:22-alpine AS runner
 
-# Copy prisma client to prod node_modules
-RUN cp -r /app/node_modules/.pnpm/@prisma+client*/node_modules/.prisma /prod/node_modules/.prisma 2>/dev/null || \
-    find /app -path "*node_modules/.prisma" -type d -exec cp -r {} /prod/node_modules/.prisma \; 2>/dev/null || true
-
-FROM node:22-slim AS runner
-
-RUN apt-get update && apt-get install -y \
-    openssl \
-    libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
-    libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
-    libxrandr2 libgbm1 libpango-1.0-0 libcairo2 \
-    libasound2 libxshmfence1 \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl chromium
 
 WORKDIR /app
 
-# Copy prod dependencies + prisma client
-COPY --from=builder /prod/node_modules ./node_modules
+# Copy node_modules (includes Prisma generated client)
+COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/apps/api/node_modules apps/api/node_modules
 
-# Copy built app + prisma schema
-COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/prisma ./prisma
-COPY --from=builder /app/apps/api/package.json ./
+# Copy built artifacts + config
+COPY --from=builder /app/apps/api/dist apps/api/dist
+COPY --from=builder /app/apps/api/prisma apps/api/prisma
+COPY --from=builder /app/apps/api/package.json apps/api/
+COPY --from=builder /app/package.json ./
 
-RUN npx playwright install chromium
+WORKDIR /app/apps/api
 
 ENV NODE_ENV=production
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
 EXPOSE 3012
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 app
-USER app
 
 CMD ["node", "dist/main"]
