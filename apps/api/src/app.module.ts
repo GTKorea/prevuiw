@@ -12,6 +12,7 @@ import { ReactionModule } from './reaction/reaction.module';
 import { ScreenshotModule } from './screenshot/screenshot.module';
 import { NotificationModule } from './notification/notification.module';
 import { ProxyModule } from './proxy/proxy.module';
+import { SdkModule } from './sdk/sdk.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ProxyModule } from './proxy/proxy.module';
     ScreenshotModule,
     NotificationModule,
     ProxyModule,
+    SdkModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
