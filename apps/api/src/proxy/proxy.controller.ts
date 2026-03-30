@@ -34,7 +34,7 @@ export class ProxyController {
 
     // Inject <base> tag so relative URLs resolve against the original domain,
     // plus a script that reports URL changes to the parent frame
-    const injected = `<base href="${baseHref}"><script>(function(){var o="${parsed.origin}";function s(){parent.postMessage({type:"prevuiw:url",url:location.href.replace(location.origin,o)},"*")}s();window.addEventListener("hashchange",s);var p=history.pushState,r=history.replaceState;history.pushState=function(){p.apply(this,arguments);s()};history.replaceState=function(){r.apply(this,arguments);s()}})()</script>`;
+    const injected = `<base href="${baseHref}"><script>(function(){var o="${parsed.origin}";function s(){parent.postMessage({type:"prevuiw:url",url:location.href.replace(location.origin,o)},"*")}s();window.addEventListener("hashchange",s);var p=history.pushState,r=history.replaceState;history.pushState=function(){p.apply(this,arguments);s()};history.replaceState=function(){r.apply(this,arguments);s()};function sc(){parent.postMessage({type:"prevuiw:scroll",scrollX:window.scrollX,scrollY:window.scrollY,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},"*")}sc();window.addEventListener("scroll",sc);window.addEventListener("resize",sc)})()</script>`;
     if (html.includes('<head>')) {
       html = html.replace('<head>', `<head>${injected}`);
     } else if (html.includes('<HEAD>')) {

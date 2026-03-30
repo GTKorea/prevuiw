@@ -1,13 +1,49 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Comment } from "@/hooks/use-comments";
-import { useCommentStore } from "@/stores/comment-store";
+import { useCommentStore, IframeScroll } from "@/stores/comment-store";
 import { CommentPin } from "./comment-pin";
 import { CommentInput } from "./comment-input";
 import { cn } from "@/lib/utils";
 
+/** Convert viewport-relative % to document-relative % using iframe scroll info */
+function viewportToDoc(
+  vx: number,
+  vy: number,
+  s: IframeScroll
+): { x: number; y: number } {
+  const docX = (vx / 100) * s.clientWidth + s.scrollX;
+  const docY = (vy / 100) * s.clientHeight + s.scrollY;
+  return {
+    x: (docX / s.scrollWidth) * 100,
+    y: (docY / s.scrollHeight) * 100,
+  };
+}
+
+/** Convert document-relative % back to viewport-relative % */
+function docToViewport(
+  dx: number,
+  dy: number,
+  s: IframeScroll
+): { x: number; y: number } {
+  const docX = (dx / 100) * s.scrollWidth;
+  const docY = (dy / 100) * s.scrollHeight;
+  return {
+    x: ((docX - s.scrollX) / s.clientWidth) * 100,
+    y: ((docY - s.scrollY) / s.clientHeight) * 100,
+  };
+}
+
+function isInViewport(vx: number, vy: number): boolean {
+  return vx >= -5 && vx <= 105 && vy >= -5 && vy <= 105;
+}
+
 interface PendingComment {
+  /** Viewport-relative % (for rendering the input popover) */
+  viewX: number;
+  viewY: number;
+  /** Document-relative % (for saving) */
   posX: number;
   posY: number;
   selectionArea?: { x: number; y: number; width: number; height: number };
@@ -30,7 +66,8 @@ export function CommentOverlay({
   onCreateComment,
   isCreating,
 }: CommentOverlayProps) {
-  const { mode, setMode, pinsVisible, iframePageUrl } = useCommentStore();
+  const { mode, setMode, pinsVisible, iframePageUrl, iframeScroll } =
+    useCommentStore();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [pending, setPending] = useState<PendingComment | null>(null);
   const [dragStart, setDragStart] = useState<{
@@ -42,6 +79,7 @@ export function CommentOverlay({
     y: number;
   } | null>(null);
 
+  /** Get click position as viewport-relative % of the overlay */
   const getPercentPosition = useCallback(
     (clientX: number, clientY: number) => {
       if (!overlayRef.current) return { x: 0, y: 0 };
@@ -57,10 +95,13 @@ export function CommentOverlay({
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       if (mode !== "placing") return;
-      const pos = getPercentPosition(e.clientX, e.clientY);
-      setPending({ posX: pos.x, posY: pos.y });
+      const vp = getPercentPosition(e.clientX, e.clientY);
+      const doc = iframeScroll
+        ? viewportToDoc(vp.x, vp.y, iframeScroll)
+        : { x: vp.x, y: vp.y };
+      setPending({ viewX: vp.x, viewY: vp.y, posX: doc.x, posY: doc.y });
     },
-    [mode, getPercentPosition]
+    [mode, getPercentPosition, iframeScroll]
   );
 
   const handleMouseDown = useCallback(
@@ -85,22 +126,45 @@ export function CommentOverlay({
   const handleMouseUp = useCallback(() => {
     if (mode !== "dragging" || !dragStart || !dragCurrent) return;
 
-    const x = Math.min(dragStart.x, dragCurrent.x);
-    const y = Math.min(dragStart.y, dragCurrent.y);
-    const width = Math.abs(dragCurrent.x - dragStart.x);
-    const height = Math.abs(dragCurrent.y - dragStart.y);
+    const vx = Math.min(dragStart.x, dragCurrent.x);
+    const vy = Math.min(dragStart.y, dragCurrent.y);
+    const vw = Math.abs(dragCurrent.x - dragStart.x);
+    const vh = Math.abs(dragCurrent.y - dragStart.y);
 
-    if (width > 1 && height > 1) {
-      setPending({
-        posX: x + width / 2,
-        posY: y + height / 2,
-        selectionArea: { x, y, width, height },
-      });
+    if (vw > 1 && vh > 1) {
+      const centerVx = vx + vw / 2;
+      const centerVy = vy + vh / 2;
+
+      if (iframeScroll) {
+        const topLeft = viewportToDoc(vx, vy, iframeScroll);
+        const bottomRight = viewportToDoc(vx + vw, vy + vh, iframeScroll);
+        const center = viewportToDoc(centerVx, centerVy, iframeScroll);
+        setPending({
+          viewX: centerVx,
+          viewY: centerVy,
+          posX: center.x,
+          posY: center.y,
+          selectionArea: {
+            x: topLeft.x,
+            y: topLeft.y,
+            width: bottomRight.x - topLeft.x,
+            height: bottomRight.y - topLeft.y,
+          },
+        });
+      } else {
+        setPending({
+          viewX: centerVx,
+          viewY: centerVy,
+          posX: centerVx,
+          posY: centerVy,
+          selectionArea: { x: vx, y: vy, width: vw, height: vh },
+        });
+      }
     }
 
     setDragStart(null);
     setDragCurrent(null);
-  }, [mode, dragStart, dragCurrent]);
+  }, [mode, dragStart, dragCurrent, iframeScroll]);
 
   const handleSubmitComment = (content: string) => {
     if (!pending) return;
@@ -118,15 +182,63 @@ export function CommentOverlay({
   // Filter top-level comments by current page URL
   const topLevelComments = comments.filter((c) => {
     if (c.parentId) return false;
-    // If we know the iframe page and the comment has a pageUrl, filter
     if (iframePageUrl && c.pageUrl) {
       return c.pageUrl === iframePageUrl;
     }
-    // Show comments without pageUrl (legacy) or when page tracking is unavailable
     return true;
   });
 
-  // Compute drag selection rectangle
+  // Convert stored doc-relative positions to current viewport positions
+  const visibleComments = useMemo(() => {
+    return topLevelComments
+      .map((comment, i) => {
+        let vpX = comment.posX;
+        let vpY = comment.posY;
+        let selArea = comment.selectionArea;
+
+        if (iframeScroll) {
+          const vp = docToViewport(comment.posX, comment.posY, iframeScroll);
+          vpX = vp.x;
+          vpY = vp.y;
+
+          if (comment.selectionArea) {
+            const sa = comment.selectionArea;
+            const tl = docToViewport(sa.x, sa.y, iframeScroll);
+            const br = docToViewport(
+              sa.x + sa.width,
+              sa.y + sa.height,
+              iframeScroll
+            );
+            selArea = {
+              x: tl.x,
+              y: tl.y,
+              width: br.x - tl.x,
+              height: br.y - tl.y,
+            };
+          }
+        }
+
+        if (!isInViewport(vpX, vpY)) return null;
+
+        return {
+          ...comment,
+          vpX,
+          vpY,
+          selArea,
+          index: i,
+        };
+      })
+      .filter(Boolean) as Array<
+      Comment & {
+        vpX: number;
+        vpY: number;
+        selArea: Comment["selectionArea"];
+        index: number;
+      }
+    >;
+  }, [topLevelComments, iframeScroll]);
+
+  // Compute drag selection rectangle (viewport-relative)
   const dragRect =
     dragStart && dragCurrent
       ? {
@@ -151,17 +263,17 @@ export function CommentOverlay({
     >
       {/* Existing comment pins */}
       {pinsVisible &&
-        topLevelComments.map((comment, i) => (
+        visibleComments.map((comment) => (
           <CommentPin
             key={comment.id}
             id={comment.id}
-            index={i}
-            posX={comment.posX}
-            posY={comment.posY}
+            index={comment.index}
+            posX={comment.vpX}
+            posY={comment.vpY}
             isResolved={comment.isResolved}
             content={comment.content}
             authorName={comment.author?.name ?? comment.guestName ?? "Guest"}
-            selectionArea={comment.selectionArea}
+            selectionArea={comment.selArea}
           />
         ))}
 
@@ -180,7 +292,24 @@ export function CommentOverlay({
       )}
 
       {/* Pending comment selection area */}
-      {pending?.selectionArea && (
+      {pending?.selectionArea && iframeScroll && (() => {
+        const sa = pending.selectionArea!;
+        const tl = docToViewport(sa.x, sa.y, iframeScroll);
+        const br = docToViewport(sa.x + sa.width, sa.y + sa.height, iframeScroll);
+        return (
+          <div
+            className="absolute border-2 border-yellow-500/60 bg-yellow-500/15 rounded-sm"
+            style={{
+              left: `${tl.x}%`,
+              top: `${tl.y}%`,
+              width: `${br.x - tl.x}%`,
+              height: `${br.y - tl.y}%`,
+              pointerEvents: "none",
+            }}
+          />
+        );
+      })()}
+      {pending?.selectionArea && !iframeScroll && (
         <div
           className="absolute border-2 border-yellow-500/60 bg-yellow-500/15 rounded-sm"
           style={{
@@ -198,8 +327,8 @@ export function CommentOverlay({
         <div
           className="absolute z-20 w-64"
           style={{
-            left: `${pending.posX}%`,
-            top: `${pending.posY}%`,
+            left: `${pending.viewX}%`,
+            top: `${pending.viewY}%`,
             transform: "translate(-50%, 8px)",
             pointerEvents: "auto",
           }}
