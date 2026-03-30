@@ -23,6 +23,10 @@ export class CreateCommentDto {
   @IsOptional()
   selectionArea?: { x: number; y: number; width: number; height: number };
 
+  @IsString()
+  @IsOptional()
+  pageUrl?: string;
+
   @IsUUID()
   @IsOptional()
   parentId?: string;

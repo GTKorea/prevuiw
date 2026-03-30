@@ -11,6 +11,7 @@ import { CommentModule } from './comment/comment.module';
 import { ReactionModule } from './reaction/reaction.module';
 import { ScreenshotModule } from './screenshot/screenshot.module';
 import { NotificationModule } from './notification/notification.module';
+import { ProxyModule } from './proxy/proxy.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NotificationModule } from './notification/notification.module';
     ReactionModule,
     ScreenshotModule,
     NotificationModule,
+    ProxyModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

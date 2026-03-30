@@ -20,6 +20,7 @@ interface CommentOverlayProps {
     posX: number;
     posY: number;
     selectionArea?: { x: number; y: number; width: number; height: number };
+    pageUrl?: string;
   }) => void;
   isCreating?: boolean;
 }
@@ -29,7 +30,7 @@ export function CommentOverlay({
   onCreateComment,
   isCreating,
 }: CommentOverlayProps) {
-  const { mode, setMode } = useCommentStore();
+  const { mode, setMode, pinsVisible, iframePageUrl } = useCommentStore();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [pending, setPending] = useState<PendingComment | null>(null);
   const [dragStart, setDragStart] = useState<{
@@ -108,12 +109,22 @@ export function CommentOverlay({
       posX: pending.posX,
       posY: pending.posY,
       selectionArea: pending.selectionArea,
+      pageUrl: iframePageUrl ?? undefined,
     });
     setPending(null);
     setMode("idle");
   };
 
-  const topLevelComments = comments.filter((c) => !c.parentId);
+  // Filter top-level comments by current page URL
+  const topLevelComments = comments.filter((c) => {
+    if (c.parentId) return false;
+    // If we know the iframe page and the comment has a pageUrl, filter
+    if (iframePageUrl && c.pageUrl) {
+      return c.pageUrl === iframePageUrl;
+    }
+    // Show comments without pageUrl (legacy) or when page tracking is unavailable
+    return true;
+  });
 
   // Compute drag selection rectangle
   const dragRect =
@@ -139,17 +150,20 @@ export function CommentOverlay({
       onMouseUp={handleMouseUp}
     >
       {/* Existing comment pins */}
-      {topLevelComments.map((comment, i) => (
-        <CommentPin
-          key={comment.id}
-          id={comment.id}
-          index={i}
-          posX={comment.posX}
-          posY={comment.posY}
-          isResolved={comment.isResolved}
-          selectionArea={comment.selectionArea}
-        />
-      ))}
+      {pinsVisible &&
+        topLevelComments.map((comment, i) => (
+          <CommentPin
+            key={comment.id}
+            id={comment.id}
+            index={i}
+            posX={comment.posX}
+            posY={comment.posY}
+            isResolved={comment.isResolved}
+            content={comment.content}
+            authorName={comment.author?.name ?? comment.guestName ?? "Guest"}
+            selectionArea={comment.selectionArea}
+          />
+        ))}
 
       {/* Drag selection rectangle */}
       {dragRect && (

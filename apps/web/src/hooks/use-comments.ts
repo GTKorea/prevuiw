@@ -30,6 +30,7 @@ export interface Comment {
     width: number;
     height: number;
   } | null;
+  pageUrl: string | null;
   parentId: string | null;
   isResolved: boolean;
   createdAt: string;
@@ -54,6 +55,7 @@ export function useCreateComment(versionId: string) {
       posX: number;
       posY: number;
       selectionArea?: { x: number; y: number; width: number; height: number };
+      pageUrl?: string;
       parentId?: string;
       guestName?: string;
     }) => api.post(`/versions/${versionId}/comments`, data),

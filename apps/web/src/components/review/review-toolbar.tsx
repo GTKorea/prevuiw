@@ -6,6 +6,8 @@ import { useCommentStore } from "@/stores/comment-store";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
+  Eye,
+  EyeOff,
   MessageSquarePlus,
   MousePointer2,
   PanelRight,
@@ -41,7 +43,7 @@ export function ReviewToolbar({
   sidebarOpen,
   onToggleSidebar,
 }: ReviewToolbarProps) {
-  const { mode, setMode } = useCommentStore();
+  const { mode, setMode, pinsVisible, setPinsVisible } = useCommentStore();
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -107,6 +109,26 @@ export function ReviewToolbar({
             <TooltipContent>Area comment</TooltipContent>
           </Tooltip>
         </div>
+
+        {/* Pin visibility toggle */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={pinsVisible ? "secondary" : "ghost"}
+              size="icon-xs"
+              onClick={() => setPinsVisible(!pinsVisible)}
+            >
+              {pinsVisible ? (
+                <Eye className="size-3.5" />
+              ) : (
+                <EyeOff className="size-3.5" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {pinsVisible ? "Hide comment pins" : "Show comment pins"}
+          </TooltipContent>
+        </Tooltip>
 
         {/* Online users */}
         {onlineCount > 0 && (

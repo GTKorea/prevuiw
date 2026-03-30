@@ -16,6 +16,7 @@ export class CommentService {
         posX: dto.posX,
         posY: dto.posY,
         selectionArea: dto.selectionArea ?? undefined,
+        pageUrl: dto.pageUrl ?? null,
         parentId: dto.parentId ?? null,
       },
       include: {

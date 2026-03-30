@@ -91,6 +91,7 @@ model Comment {
   posX          Float
   posY          Float
   selectionArea Json?
+  pageUrl       String?
   parentId      String?  @db.Uuid
   isResolved    Boolean  @default(false)
   createdAt     DateTime @default(now())

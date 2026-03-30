@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { UrlType } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
+import { ScreenshotService } from '@/screenshot/screenshot.service';
 import { CreateVersionDto } from './dto/version.dto';
 import { validateExternalUrl } from '@/common/utils/url-validator';
 
@@ -14,7 +15,12 @@ const IMMUTABLE_PATTERNS = [
 
 @Injectable()
 export class VersionService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(VersionService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private screenshotService: ScreenshotService,
+  ) {}
 
   detectUrlType(url: string): UrlType {
     const isImmutable = IMMUTABLE_PATTERNS.some((pattern) => pattern.test(url));
@@ -48,7 +54,7 @@ export class VersionService {
 
     const urlType = this.detectUrlType(dto.url);
 
-    return this.prisma.version.create({
+    const version = await this.prisma.version.create({
       data: {
         projectId,
         versionName: dto.versionName,
@@ -64,6 +70,14 @@ export class VersionService {
         screenshots: true,
       },
     });
+
+    if (urlType === UrlType.IMMUTABLE) {
+      this.screenshotService
+        .captureAndStore(version.id, dto.url)
+        .catch((err) => this.logger.error(`Screenshot capture failed for version ${version.id}:`, err));
+    }
+
+    return version;
   }
 
   async findAllByProject(projectId: string) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useProject } from "@/hooks/use-versions";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -31,10 +31,25 @@ export default function ReviewPage() {
     useComments(versionId);
   const createComment = useCreateComment(versionId);
   const { onlineCount } = useCommentSocket(versionId);
-  const { setMode } = useCommentStore();
+  const { setMode, setIframePageUrl, iframePageUrl } = useCommentStore();
+
+  // Listen for page URL changes from proxied iframes
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (e.data?.type === "prevuiw:url" && typeof e.data.url === "string") {
+        setIframePageUrl(e.data.url);
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      setIframePageUrl(null);
+    };
+  }, [setIframePageUrl]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [guestDialogOpen, setGuestDialogOpen] = useState(false);
+  const [proxyFailed, setProxyFailed] = useState(false);
   const [pendingCommentData, setPendingCommentData] = useState<{
     content: string;
     posX: number;
@@ -46,12 +61,10 @@ export default function ReviewPage() {
   // Find the version in the project data
   const version = project?.versions.find((v) => v.id === versionId);
 
-  // Determine if we should show screenshots instead of iframe
-  const showScreenshots =
-    version &&
-    version.urlType === "MUTABLE" &&
-    !version.isActive &&
-    version.screenshots.length > 0;
+  // IMMUTABLE URLs (Vercel, Netlify, etc.) block direct iframe embedding.
+  // Strategy: proxy iframe (interactive) → screenshot fallback (static)
+  const isImmutable = version?.urlType === "IMMUTABLE";
+  const hasScreenshots = version && version.screenshots.length > 0;
 
   const submitComment = useCallback(
     (data: {
@@ -59,12 +72,16 @@ export default function ReviewPage() {
       posX: number;
       posY: number;
       selectionArea?: { x: number; y: number; width: number; height: number };
+      pageUrl?: string;
       parentId?: string;
       guestName?: string;
     }) => {
-      createComment.mutate(data);
+      createComment.mutate({
+        ...data,
+        pageUrl: data.pageUrl ?? iframePageUrl ?? undefined,
+      });
     },
-    [createComment]
+    [createComment, iframePageUrl]
   );
 
   const handleCreateComment = useCallback(
@@ -73,6 +90,7 @@ export default function ReviewPage() {
       posX: number;
       posY: number;
       selectionArea?: { x: number; y: number; width: number; height: number };
+      pageUrl?: string;
     }) => {
       if (!user) {
         const guestName = getGuestName();
@@ -142,6 +160,14 @@ export default function ReviewPage() {
 
   const topLevelComments = comments.filter((c) => !c.parentId);
 
+  // Determine what to render:
+  // 1. IMMUTABLE + proxy failed + has screenshots → screenshot fallback
+  // 2. IMMUTABLE + proxy not failed → proxy iframe (interactive)
+  // 3. MUTABLE → direct iframe
+  const showScreenshotFallback = isImmutable && proxyFailed && hasScreenshots;
+  const showProxyIframe = isImmutable && !proxyFailed;
+  const showProxyFailedNoScreenshots = isImmutable && proxyFailed && !hasScreenshots;
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <ReviewToolbar
@@ -154,10 +180,22 @@ export default function ReviewPage() {
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
+      {/* Fallback notification banner */}
+      {showScreenshotFallback && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-xs text-yellow-600 dark:text-yellow-400">
+          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>
+            This site blocks direct embedding. Showing static screenshots — interactions (clicks, scroll) are not available.
+          </span>
+        </div>
+      )}
+
       <div className="flex flex-1 min-h-0">
         {/* Main content area */}
         <div className="flex-1 relative min-w-0">
-          {showScreenshots ? (
+          {showScreenshotFallback ? (
             <>
               <CommentOverlay
                 comments={comments}
@@ -166,6 +204,22 @@ export default function ReviewPage() {
               />
               <ScreenshotViewer screenshots={version.screenshots} />
             </>
+          ) : showProxyFailedNoScreenshots ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
+              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div className="text-center max-w-md">
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Unable to load this site
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  This site has authentication protection (e.g. Vercel Deployment Protection) that prevents embedding. Try using a production URL or disabling deployment protection.
+                </p>
+              </div>
+            </div>
           ) : (
             <>
               <CommentOverlay
@@ -173,7 +227,11 @@ export default function ReviewPage() {
                 onCreateComment={handleCreateComment}
                 isCreating={createComment.isPending}
               />
-              <IframeContainer url={version.url} />
+              <IframeContainer
+                url={version.url}
+                useProxy={showProxyIframe}
+                onProxyError={() => setProxyFailed(true)}
+              />
             </>
           )}
         </div>
