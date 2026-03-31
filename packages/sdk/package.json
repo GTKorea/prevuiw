@@ -1,0 +1,20 @@
+{
+  "name": "@prevuiw/sdk",
+  "version": "0.1.0",
+  "description": "Prevuiw scroll & URL tracking SDK for iframe-embedded sites",
+  "main": "dist/index.global.js",
+  "sideEffects": true,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "css-selector-generator": "^3.9.1",
+    "socket.io-client": "^4.7.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT"
+}
