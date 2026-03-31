@@ -55,9 +55,10 @@ model Project {
   ownerId   String?   @db.Uuid
   isGuest   Boolean   @default(false)
   guestId   String?
-  expiresAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  expiresAt       DateTime?
+  publishableKey  String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   owner    User?     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   versions Version[]
@@ -92,6 +93,7 @@ model Comment {
   posY          Float
   selectionArea Json?
   pageUrl       String?
+  cssSelector   String?
   parentId      String?  @db.Uuid
   isResolved    Boolean  @default(false)
   createdAt     DateTime @default(now())

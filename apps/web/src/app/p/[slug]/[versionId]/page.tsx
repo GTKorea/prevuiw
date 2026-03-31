@@ -1,8 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Copy, Check, AlertCircle } from "lucide-react";
 import { useProject } from "@/hooks/use-versions";
+import { SDK_SNIPPET } from "@/lib/sdk-snippet";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useAuth } from "@/hooks/use-auth";
 import {
   useComments,
@@ -14,6 +17,7 @@ import { ReviewToolbar } from "@/components/review/review-toolbar";
 import { IframeContainer } from "@/components/review/iframe-container";
 import { CommentOverlay } from "@/components/review/comment-overlay";
 import { CommentSidebar } from "@/components/review/comment-sidebar";
+import { CursorOverlay } from "@/components/review/cursor-overlay";
 import { ScreenshotViewer } from "@/components/review/screenshot-viewer";
 import {
   GuestNameDialog,
@@ -30,37 +34,45 @@ export default function ReviewPage() {
   const { data: comments = [], isLoading: commentsLoading } =
     useComments(versionId);
   const createComment = useCreateComment(versionId);
-  const { onlineCount } = useCommentSocket(versionId);
-  const { setMode, setIframePageUrl, setIframeScroll, iframePageUrl } = useCommentStore();
+  const { onlineCount, socketRef } = useCommentSocket(versionId);
+  const { setMode, setIframePageUrl, iframePageUrl, setSdkDetected } = useCommentStore();
+  const contentAreaRef = useRef<HTMLDivElement>(null);
 
-  // Listen for page URL and scroll changes from proxied iframes
+  // Listen for page URL changes and SDK handshake
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
+      if (e.data?.type === "prevuiw:ping" && e.source) {
+        (e.source as Window).postMessage({ type: "prevuiw:pong" }, "*");
+        setSdkDetected(true);
+      }
       if (e.data?.type === "prevuiw:url" && typeof e.data.url === "string") {
         setIframePageUrl(e.data.url);
-      }
-      if (e.data?.type === "prevuiw:scroll") {
-        setIframeScroll({
-          scrollX: e.data.scrollX,
-          scrollY: e.data.scrollY,
-          scrollWidth: e.data.scrollWidth,
-          scrollHeight: e.data.scrollHeight,
-          clientWidth: e.data.clientWidth,
-          clientHeight: e.data.clientHeight,
-        });
       }
     }
     window.addEventListener("message", handleMessage);
     return () => {
       window.removeEventListener("message", handleMessage);
       setIframePageUrl(null);
-      setIframeScroll(null);
+      setSdkDetected(false);
     };
-  }, [setIframePageUrl, setIframeScroll]);
+  }, [setIframePageUrl, setSdkDetected]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [guestDialogOpen, setGuestDialogOpen] = useState(false);
   const [proxyFailed, setProxyFailed] = useState(false);
+  const [sdkCheckDone, setSdkCheckDone] = useState(false);
+  const { copied: sdkCopied, copy: copySdk } = useCopyToClipboard();
+
+  // Wait 3s for SDK handshake before marking check as done
+  const sdkDetected = useCommentStore((s) => s.sdkDetected);
+  useEffect(() => {
+    if (sdkDetected) {
+      setSdkCheckDone(true);
+      return;
+    }
+    const timer = setTimeout(() => setSdkCheckDone(true), 3000);
+    return () => clearTimeout(timer);
+  }, [sdkDetected]);
   const [pendingCommentData, setPendingCommentData] = useState<{
     content: string;
     posX: number;
@@ -76,6 +88,7 @@ export default function ReviewPage() {
   // MUTABLE URLs load directly (preserving origin for JS/API calls).
   const isImmutable = version?.urlType === "IMMUTABLE";
   const hasScreenshots = version && version.screenshots.length > 0;
+  const sdkMissing = !isImmutable && sdkCheckDone && !sdkDetected;
 
   const submitComment = useCallback(
     (data: {
@@ -175,8 +188,10 @@ export default function ReviewPage() {
   const showProxyIframe = isImmutable && !proxyFailed;
   const showProxyFailedNoScreenshots = isImmutable && proxyFailed && !hasScreenshots;
 
+  const cursorUserName = user?.name || getGuestName() || "Anonymous";
+
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
       <ReviewToolbar
         projectName={project.name}
         projectSlug={slug}
@@ -185,14 +200,28 @@ export default function ReviewPage() {
         onlineCount={onlineCount}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        disabled={sdkMissing}
       />
+
+      {/* SDK missing banner — MUTABLE sites without SDK */}
+      {sdkMissing && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-orange-500/10 border-b border-orange-500/20 text-xs text-orange-600 dark:text-orange-400">
+          <AlertCircle className="size-4 shrink-0" />
+          <span>To leave comments, add the prevuiw SDK script to your site's {"<head>"}.</span>
+          <button
+            className="shrink-0 rounded border border-border bg-background px-2 py-0.5 text-[11px] font-medium hover:bg-muted transition-colors"
+            onClick={() => copySdk(SDK_SNIPPET)}
+          >
+            {sdkCopied ? <Check className="inline size-3" /> : <Copy className="inline size-3" />}
+            {sdkCopied ? " Copied!" : " Copy SDK snippet"}
+          </button>
+        </div>
+      )}
 
       {/* Fallback notification banner */}
       {showScreenshotFallback && (
         <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-xs text-yellow-600 dark:text-yellow-400">
-          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-          </svg>
+          <AlertCircle className="size-4 shrink-0" />
           <span>
             This site blocks direct embedding. Showing static screenshots — interactions (clicks, scroll) are not available.
           </span>
@@ -201,7 +230,12 @@ export default function ReviewPage() {
 
       <div className="flex flex-1 min-h-0">
         {/* Main content area */}
-        <div className="flex-1 relative min-w-0">
+        <div className="flex-1 relative min-w-0" ref={contentAreaRef}>
+          <CursorOverlay
+            socketRef={socketRef}
+            userName={cursorUserName}
+            trackRef={contentAreaRef}
+          />
           {showScreenshotFallback ? (
             <>
               <CommentOverlay
@@ -214,9 +248,7 @@ export default function ReviewPage() {
           ) : showProxyFailedNoScreenshots ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
               <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
+                <AlertCircle className="size-6 text-muted-foreground" />
               </div>
               <div className="text-center max-w-md">
                 <p className="text-sm font-medium text-foreground mb-1">

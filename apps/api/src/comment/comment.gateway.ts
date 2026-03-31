@@ -1,6 +1,7 @@
 import {
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
@@ -18,6 +19,28 @@ export class CommentGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
   // Map of versionId -> Set of socketIds
   private versionRooms = new Map<string, Set<string>>();
+  // Map of socketId -> cursor user info
+  private cursorUsers = new Map<string, { name: string; color: string }>();
+
+  private static CURSOR_COLORS = [
+    '#ef4444', '#f97316', '#eab308', '#22c55e',
+    '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899',
+  ];
+
+  private pickColor(): string {
+    const usedColors = new Set(
+      [...this.cursorUsers.values()].map((u) => u.color),
+    );
+    const available = CommentGateway.CURSOR_COLORS.find(
+      (c) => !usedColors.has(c),
+    );
+    return (
+      available ||
+      CommentGateway.CURSOR_COLORS[
+        this.cursorUsers.size % CommentGateway.CURSOR_COLORS.length
+      ]
+    );
+  }
 
   handleConnection(client: any) {
     const versionId = client.handshake.query.versionId as string;
@@ -49,6 +72,60 @@ export class CommentGateway implements OnGatewayConnection, OnGatewayDisconnect 
         this.versionRooms.delete(versionId);
       }
     }
+
+    // Notify others that cursor left
+    if (this.cursorUsers.has(client.id)) {
+      this.cursorUsers.delete(client.id);
+      client.to(roomName).emit('cursor:leave', { socketId: client.id });
+    }
+  }
+
+  @SubscribeMessage('cursor:join')
+  handleCursorJoin(client: any, payload: { name: string }) {
+    const versionId = client.handshake.query.versionId as string;
+    if (!versionId) return;
+
+    const color = this.pickColor();
+    this.cursorUsers.set(client.id, { name: payload.name, color });
+
+    const roomName = `version:${versionId}`;
+    // Broadcast to others
+    client.to(roomName).emit('cursor:join', {
+      socketId: client.id,
+      name: payload.name,
+      color,
+    });
+
+    // Send existing cursors to the newly joined client
+    const existing: Array<{ socketId: string; name: string; color: string }> =
+      [];
+    const room = this.versionRooms.get(versionId);
+    if (room) {
+      for (const sid of room) {
+        if (sid !== client.id && this.cursorUsers.has(sid)) {
+          existing.push({ socketId: sid, ...this.cursorUsers.get(sid)! });
+        }
+      }
+    }
+    if (existing.length > 0) {
+      client.emit('cursor:existing', existing);
+    }
+  }
+
+  @SubscribeMessage('cursor:move')
+  handleCursorMove(
+    client: any,
+    payload: { x: number; y: number },
+  ) {
+    const versionId = client.handshake.query.versionId as string;
+    if (!versionId) return;
+
+    const roomName = `version:${versionId}`;
+    client.to(roomName).emit('cursor:move', {
+      socketId: client.id,
+      x: payload.x,
+      y: payload.y,
+    });
   }
 
   emitNewComment(versionId: string, comment: any) {

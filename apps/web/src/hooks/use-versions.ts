@@ -24,6 +24,7 @@ interface ProjectDetail {
   id: string;
   name: string;
   slug: string;
+  publishableKey: string | null;
   owner: { id: string; name: string; avatarUrl: string | null };
   versions: Version[];
 }
@@ -33,6 +34,14 @@ export function useProject(slug: string) {
     queryKey: ["project", slug],
     queryFn: () => api.get(`/projects/${slug}`),
     enabled: !!slug,
+  });
+}
+
+export function useGenerateKey(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<{ id: string; publishableKey: string }>({
+    mutationFn: () => api.post(`/projects/${projectId}/generate-key`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project"] }),
   });
 }
 

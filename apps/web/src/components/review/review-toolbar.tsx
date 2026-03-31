@@ -8,12 +8,10 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  MessageSquarePlus,
+  MessageCircle,
   MousePointer2,
   PanelRight,
-  SquareDashedMousePointer,
   Users,
-  Share2,
   Link as LinkIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +30,11 @@ interface ReviewToolbarProps {
   onlineCount: number;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
+  disabled?: boolean;
 }
+
+const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+const modKey = isMac ? "\u2318" : "Ctrl";
 
 export function ReviewToolbar({
   projectName,
@@ -42,6 +44,7 @@ export function ReviewToolbar({
   onlineCount,
   sidebarOpen,
   onToggleSidebar,
+  disabled,
 }: ReviewToolbarProps) {
   const { mode, setMode, pinsVisible, setPinsVisible } = useCommentStore();
 
@@ -51,11 +54,11 @@ export function ReviewToolbar({
 
   return (
     <TooltipProvider>
-      <div className="h-12 border-b border-border bg-background flex items-center px-3 gap-2 shrink-0">
-        {/* Back + project name */}
+      {/* Top header — project name only */}
+      <div className="h-12 border-b border-border bg-background flex items-center px-3 gap-2 shrink-0 relative z-20">
         <Link
           href={`/p/${projectSlug}`}
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <ArrowLeft className="size-4" />
         </Link>
@@ -67,101 +70,100 @@ export function ReviewToolbar({
           </Badge>
         </div>
 
-        {/* Spacer */}
         <div className="flex-1" />
-
-        {/* Comment mode tools */}
-        <div className="flex items-center gap-1 border border-border rounded-md p-0.5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={mode === "idle" ? "secondary" : "ghost"}
-                size="icon-xs"
-                onClick={() => setMode("idle")}
-              >
-                <MousePointer2 className="size-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Browse mode</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={mode === "placing" ? "secondary" : "ghost"}
-                size="icon-xs"
-                onClick={() => setMode("placing")}
-              >
-                <MessageSquarePlus className="size-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Point comment</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={mode === "dragging" ? "secondary" : "ghost"}
-                size="icon-xs"
-                onClick={() => setMode("dragging")}
-              >
-                <SquareDashedMousePointer className="size-3.5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Area comment</TooltipContent>
-          </Tooltip>
-        </div>
-
-        {/* Pin visibility toggle */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={pinsVisible ? "secondary" : "ghost"}
-              size="icon-xs"
-              onClick={() => setPinsVisible(!pinsVisible)}
-            >
-              {pinsVisible ? (
-                <Eye className="size-3.5" />
-              ) : (
-                <EyeOff className="size-3.5" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {pinsVisible ? "Hide comment pins" : "Show comment pins"}
-          </TooltipContent>
-        </Tooltip>
 
         {/* Online users */}
         {onlineCount > 0 && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Users className="size-3.5" />
+            <Users className="size-4" />
             <span>{onlineCount}</span>
           </div>
         )}
 
-        {/* Comment count + sidebar toggle */}
+        {/* Share */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon-xs" onClick={handleCopyLink} className="cursor-pointer">
+              <LinkIcon className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Copy link</TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Floating bottom toolbar — Figma style */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 rounded-xl border border-border bg-background/95 backdrop-blur-sm shadow-lg px-2 py-1.5">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={mode === "idle" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setMode("idle")}
+              disabled={disabled}
+              className="cursor-pointer gap-1.5"
+            >
+              <MousePointer2 className="size-4" />
+              <span className="text-xs hidden sm:inline">Browse</span>
+              <kbd className="text-[10px] text-muted-foreground ml-0.5 hidden sm:inline">V</kbd>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Browse mode (V)</TooltipContent>
+        </Tooltip>
+
+        <div className="w-px h-5 bg-border" />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={mode === "commenting" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setMode("commenting")}
+              disabled={disabled}
+              className="cursor-pointer gap-1.5"
+            >
+              <MessageCircle className="size-4" />
+              <span className="text-xs hidden sm:inline">Comment</span>
+              <kbd className="text-[10px] text-muted-foreground ml-0.5 hidden sm:inline">{modKey}</kbd>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Click or drag to comment ({modKey})</TooltipContent>
+        </Tooltip>
+
+        <div className="w-px h-5 bg-border" />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={pinsVisible ? "secondary" : "ghost"}
+              size="icon-sm"
+              onClick={() => setPinsVisible(!pinsVisible)}
+              className="cursor-pointer"
+            >
+              {pinsVisible ? (
+                <Eye className="size-4" />
+              ) : (
+                <EyeOff className="size-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {pinsVisible ? "Hide pins" : "Show pins"}
+          </TooltipContent>
+        </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant={sidebarOpen ? "secondary" : "ghost"}
-              size="xs"
+              size="sm"
               onClick={onToggleSidebar}
-              className="gap-1.5"
+              className="cursor-pointer gap-1"
             >
-              <PanelRight className="size-3.5" />
+              <PanelRight className="size-4" />
               <span className="text-xs">{commentCount}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>Toggle comments</TooltipContent>
-        </Tooltip>
-
-        {/* Share */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-xs" onClick={handleCopyLink}>
-              <LinkIcon className="size-3.5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Copy link</TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>

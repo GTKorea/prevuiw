@@ -113,7 +113,7 @@ export function CommentThread({
               ).map(([emoji, count]) => (
                 <button
                   key={emoji}
-                  className="inline-flex items-center gap-0.5 rounded-full border border-border px-1.5 py-0.5 text-xs hover:bg-accent transition-colors"
+                  className="inline-flex items-center gap-0.5 rounded-full border border-border px-1.5 py-0.5 text-xs hover:bg-accent transition-colors cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleReaction.mutate({
@@ -171,7 +171,7 @@ export function CommentThread({
                   {REACTION_EMOJIS.map((emoji) => (
                     <button
                       key={emoji}
-                      className="rounded p-1 hover:bg-accent text-sm"
+                      className="rounded p-1 hover:bg-accent text-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleReaction.mutate({

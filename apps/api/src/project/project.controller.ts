@@ -61,4 +61,10 @@ export class ProjectController {
   delete(@Param('slug') slug: string, @CurrentUser() user: any) {
     return this.projectService.delete(slug, user.id);
   }
+
+  @Post(':id/generate-key')
+  @UseGuards(JwtAuthGuard)
+  generateKey(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.projectService.generatePublishableKey(id, user.id);
+  }
 }

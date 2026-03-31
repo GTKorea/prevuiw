@@ -127,6 +127,9 @@ export class ProjectService {
             url: true,
             isActive: true,
             createdAt: true,
+            _count: {
+              select: { comments: true },
+            },
           },
         },
       },
@@ -202,5 +205,29 @@ export class ProjectService {
     }
 
     await this.prisma.project.delete({ where: { slug } });
+  }
+
+  async generatePublishableKey(projectId: string, userId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
+    if (!project) throw new NotFoundException('Project not found');
+    if (project.ownerId !== userId) throw new ForbiddenException('Not your project');
+
+    const key = `pk_${randomBytes(24).toString('hex')}`;
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data: { publishableKey: key },
+      select: { id: true, publishableKey: true },
+    });
+  }
+
+  async findByPublishableKey(key: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { publishableKey: key },
+      include: { versions: { where: { isActive: true }, orderBy: { createdAt: 'desc' } } },
+    });
+    if (!project) return null;
+    return project;
   }
 }
