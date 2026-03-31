@@ -15,7 +15,7 @@ export default function VersionHistoryPage() {
   if (isLoading) return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   if (!project) return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Project not found</p></div>;
 
-  const isOwner = user?.id === project.owner.id;
+  const isOwner = user?.id === project.owner?.id;
 
   return (
     <div className="min-h-screen bg-background">

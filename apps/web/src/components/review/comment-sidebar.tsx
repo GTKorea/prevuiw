@@ -66,7 +66,7 @@ export function CommentSidebar({
           <button
             key={key}
             className={cn(
-              "flex-1 py-2 text-xs font-medium transition-colors border-b-2",
+              "flex-1 py-2 text-xs font-medium transition-colors border-b-2 cursor-pointer",
               filter === key
                 ? "border-foreground text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -79,7 +79,7 @@ export function CommentSidebar({
       </div>
 
       {/* Comment list */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 overflow-hidden">
         {filteredComments.length === 0 ? (
           <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
             No comments yet

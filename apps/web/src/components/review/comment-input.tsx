@@ -48,7 +48,7 @@ export function CommentInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="min-h-[60px] resize-none bg-background text-sm"
+        className="min-h-[100px] resize-none bg-background text-sm"
       />
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">

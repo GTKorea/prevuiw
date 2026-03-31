@@ -39,11 +39,15 @@ export function CommentPin({
       {selectionArea && (
         <div
           className={cn(
-            "absolute border-2 rounded-sm",
+            "absolute border-2 border-dashed rounded-sm",
             isResolved
-              ? "border-green-500/40 bg-green-500/10"
-              : "border-yellow-500/40 bg-yellow-500/10"
+              ? "border-green-500/60 bg-green-500/5"
+              : "border-yellow-500/60 bg-yellow-500/5"
           )}
+          data-area-x={selectionArea.x}
+          data-area-y={selectionArea.y}
+          data-area-w={selectionArea.width}
+          data-area-h={selectionArea.height}
           style={{
             left: `${selectionArea.x}%`,
             top: `${selectionArea.y}%`,
@@ -60,10 +64,12 @@ export function CommentPin({
           top: `${posY}%`,
           pointerEvents: "auto",
         }}
+        data-doc-x={posX}
+        data-doc-y={posY}
       >
         <button
           className={cn(
-            "flex items-center justify-center rounded-full text-white text-xs font-bold shadow-lg transition-transform hover:scale-110",
+            "flex items-center justify-center rounded-full text-white text-xs font-bold shadow-lg transition-transform hover:scale-110 cursor-pointer",
             "w-6 h-6 -translate-x-1/2 -translate-y-1/2",
             isResolved ? "bg-green-500" : "bg-blue-500",
             isActive && "ring-2 ring-white scale-125"

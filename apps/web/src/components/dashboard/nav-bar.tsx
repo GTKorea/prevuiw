@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
