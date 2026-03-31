@@ -8,3 +8,4 @@ dist/
 .superpowers/
 .gstack/
 .env.development
+test-sdk.html

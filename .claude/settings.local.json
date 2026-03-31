@@ -31,7 +31,34 @@
       "Bash(gh auth:*)",
       "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch apps/api/.env.development' --prune-empty -- --all)",
       "Bash(find /Users/hjick/Documents/applications/krow-tools/ito-claude -name *.yml -path *github* -o -name *.yml -path *workflow*)",
-      "Bash(head -5 find /Users/hjick/Documents/applications/krow-tools/ito-claude -name deploy*)"
+      "Bash(head -5 find /Users/hjick/Documents/applications/krow-tools/ito-claude -name deploy*)",
+      "Bash(vercel --version)",
+      "Bash(pg_isready)",
+      "Bash(psql -U postgres -lqt)",
+      "Bash(psql:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep '\"\"version\"\"' /Users/hjick/Documents/applications/krow-tools/prevuiw/node_modules/next-themes/package.json)",
+      "Bash(grep '\"\"version\"\"' /Users/hjick/Documents/applications/krow-tools/prevuiw/apps/web/node_modules/next-themes/package.json)",
+      "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw -path */next-themes/dist/* -name *.js)",
+      "Bash(curl -sI http://localhost:3012/sdk.js)",
+      "Bash(grep '\"\"next\"\"' /Users/hjick/Documents/applications/inflee-front/apps/influencer/package.json)",
+      "Bash(grep '\"\"next\"\"' /Users/hjick/Documents/applications/inflee-front/package.json)",
+      "Bash(curl -sI -H \"Origin: http://localhost:3000\" http://localhost:3012/sdk.js)",
+      "Bash(lsof:*)",
+      "Bash(ps -p 9265 -o command=)",
+      "Bash(gzip -c packages/sdk/dist/index.global.js)",
+      "Bash(curl:*)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_48e401e2cbff6ba8__ $B js \":*)",
+      "Bash(1 __NEW_LINE_48e401e2cbff6ba8__ sleep 5 $B console)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_7c10b48b9219c554__ $B goto \"http://localhost:8080/test-sdk.html?prevuiw\")",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_b7d243a0468460ea__ $B console)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_9885100eae2b5e73__ $B goto \"http://localhost:8080/test-sdk.html?prevuiw\")",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse sleep 5 $B console)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse $B console)"
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false
   }
 }
