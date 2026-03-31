@@ -1,85 +1,31 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@/app.module';
-import { PrismaService } from '@/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { GoogleStrategy } from '@/auth/strategies/google.strategy';
-import { GithubStrategy } from '@/auth/strategies/github.strategy';
-
-// Stub strategies to avoid requiring real OAuth credentials in tests
-class GoogleStrategyStub {
-  name = 'google';
-}
-
-class GithubStrategyStub {
-  name = 'github';
-}
+import { createTestApp, createTestUser, closeTestApp, TestContext } from './helpers/setup';
 
 describe('Project (e2e)', () => {
-  let app: INestApplication;
-  let prisma: PrismaService;
-  let jwtService: JwtService;
+  let ctx: TestContext;
   let token: string;
   let userId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(GoogleStrategy)
-      .useClass(GoogleStrategyStub)
-      .overrideProvider(GithubStrategy)
-      .useClass(GithubStrategyStub)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-
-    prisma = moduleFixture.get<PrismaService>(PrismaService);
-    jwtService = moduleFixture.get<JwtService>(JwtService);
-
-    await app.init();
+    ctx = await createTestApp();
   });
 
   beforeEach(async () => {
-    // Create a test user and issue a token before each test
-    const user = await prisma.user.create({
-      data: {
-        email: `test-project-e2e-${Date.now()}@example.com`,
-        name: 'Project E2E User',
-        provider: 'GITHUB',
-        providerId: `project-e2e-${Date.now()}`,
-      },
-    });
+    const { user, token: t } = await createTestUser(ctx.prisma, ctx.jwtService, 'project');
     userId = user.id;
-    token = jwtService.sign({ sub: user.id, email: user.email });
+    token = t;
   });
 
   afterEach(async () => {
-    // Clean up projects and user after each test
-    await prisma.project.deleteMany({ where: { ownerId: userId } });
-    await prisma.user.deleteMany({ where: { id: userId } });
+    await ctx.prisma.project.deleteMany({ where: { ownerId: userId } });
+    await ctx.prisma.user.deleteMany({ where: { id: userId } });
   });
 
-  afterAll(async () => {
-    if (prisma) {
-      await prisma.$disconnect();
-    }
-    if (app) {
-      await app.close();
-    }
-  });
+  afterAll(() => closeTestApp(ctx));
 
   describe('POST /projects', () => {
     it('should create a project when authenticated', async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .post('/projects')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'My Test Project' })
@@ -90,34 +36,43 @@ describe('Project (e2e)', () => {
         ownerId: userId,
       });
       expect(response.body.slug).toBeDefined();
-      expect(typeof response.body.slug).toBe('string');
-      expect(response.body.slug).toMatch(/^my-test-project-[a-f0-9]{6}$/);
+      expect(response.body.slug).toMatch(/^my-test-project-[a-f0-9]{16}$/);
     });
 
-    it('should return 401 without token', () => {
-      return request(app.getHttpServer())
+    it('should create a guest project without token', async () => {
+      const response = await request(ctx.app.getHttpServer())
         .post('/projects')
-        .send({ name: 'My Test Project' })
-        .expect(401);
+        .set('x-guest-id', `guest-e2e-${Date.now()}`)
+        .send({ name: 'Guest Project' })
+        .expect(201);
+
+      expect(response.body).toMatchObject({
+        name: 'Guest Project',
+        isGuest: true,
+      });
+      expect(response.body.ownerId).toBeNull();
+      expect(response.body.expiresAt).toBeDefined();
+
+      // Clean up guest project
+      await ctx.prisma.project.delete({ where: { id: response.body.id } });
     });
   });
 
   describe('GET /projects', () => {
     it('should list the authenticated user\'s projects', async () => {
-      // Create two projects first
-      await request(app.getHttpServer())
+      await request(ctx.app.getHttpServer())
         .post('/projects')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Project Alpha' })
         .expect(201);
 
-      await request(app.getHttpServer())
+      await request(ctx.app.getHttpServer())
         .post('/projects')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Project Beta' })
         .expect(201);
 
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .get('/projects')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
@@ -130,7 +85,7 @@ describe('Project (e2e)', () => {
     });
 
     it('should return 401 without token', () => {
-      return request(app.getHttpServer())
+      return request(ctx.app.getHttpServer())
         .get('/projects')
         .expect(401);
     });
@@ -138,8 +93,7 @@ describe('Project (e2e)', () => {
 
   describe('GET /projects/:slug', () => {
     it('should return the project without authentication (public access)', async () => {
-      // Create project first
-      const createResponse = await request(app.getHttpServer())
+      const createResponse = await request(ctx.app.getHttpServer())
         .post('/projects')
         .set('Authorization', `Bearer ${token}`)
         .send({ name: 'Public Project' })
@@ -147,8 +101,7 @@ describe('Project (e2e)', () => {
 
       const slug = createResponse.body.slug;
 
-      // Access without auth token
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .get(`/projects/${slug}`)
         .expect(200);
 
@@ -162,9 +115,155 @@ describe('Project (e2e)', () => {
     });
 
     it('should return 404 for non-existent slug', () => {
-      return request(app.getHttpServer())
+      return request(ctx.app.getHttpServer())
         .get('/projects/non-existent-slug-abc123')
         .expect(404);
+    });
+  });
+
+  describe('PATCH /projects/:slug', () => {
+    it('should update project name when owner', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Old Name' })
+        .expect(201);
+
+      const response = await request(ctx.app.getHttpServer())
+        .patch(`/projects/${create.body.slug}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'New Name' })
+        .expect(200);
+
+      expect(response.body.name).toBe('New Name');
+    });
+
+    it('should return 401 without token', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Test' })
+        .expect(201);
+
+      return request(ctx.app.getHttpServer())
+        .patch(`/projects/${create.body.slug}`)
+        .send({ name: 'Updated' })
+        .expect(401);
+    });
+
+    it('should return 403 when non-owner tries to update', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Owner Project' })
+        .expect(201);
+
+      const { user: other, token: otherToken } = await createTestUser(
+        ctx.prisma, ctx.jwtService, 'other-project',
+      );
+
+      await request(ctx.app.getHttpServer())
+        .patch(`/projects/${create.body.slug}`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .send({ name: 'Hijacked' })
+        .expect(403);
+
+      await ctx.prisma.user.delete({ where: { id: other.id } });
+    });
+
+    it('should return 404 for non-existent slug', () => {
+      return request(ctx.app.getHttpServer())
+        .patch('/projects/non-existent-slug-abc123')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'X' })
+        .expect(404);
+    });
+  });
+
+  describe('DELETE /projects/:slug', () => {
+    it('should delete project when owner', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'To Delete' })
+        .expect(201);
+
+      await request(ctx.app.getHttpServer())
+        .delete(`/projects/${create.body.slug}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204);
+
+      await request(ctx.app.getHttpServer())
+        .get(`/projects/${create.body.slug}`)
+        .expect(404);
+    });
+
+    it('should return 403 when non-owner tries to delete', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Protected Project' })
+        .expect(201);
+
+      const { user: other, token: otherToken } = await createTestUser(
+        ctx.prisma, ctx.jwtService, 'other-del',
+      );
+
+      await request(ctx.app.getHttpServer())
+        .delete(`/projects/${create.body.slug}`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .expect(403);
+
+      await ctx.prisma.user.delete({ where: { id: other.id } });
+    });
+
+    it('should return 401 without token', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Auth Required' })
+        .expect(201);
+
+      return request(ctx.app.getHttpServer())
+        .delete(`/projects/${create.body.slug}`)
+        .expect(401);
+    });
+  });
+
+  describe('POST /projects/:id/generate-key', () => {
+    let projectId: string;
+
+    beforeEach(async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post('/projects')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Key Project' })
+        .expect(201);
+      projectId = create.body.id;
+    });
+
+    it('should generate a publishable key for a project', async () => {
+      const response = await request(ctx.app.getHttpServer())
+        .post(`/projects/${projectId}/generate-key`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201);
+
+      expect(response.body.publishableKey).toBeDefined();
+      expect(response.body.publishableKey).toMatch(/^pk_/);
+    });
+
+    it('should regenerate key (invalidate old one)', async () => {
+      const first = await request(ctx.app.getHttpServer())
+        .post(`/projects/${projectId}/generate-key`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201);
+
+      const second = await request(ctx.app.getHttpServer())
+        .post(`/projects/${projectId}/generate-key`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201);
+
+      expect(second.body.publishableKey).not.toBe(first.body.publishableKey);
     });
   });
 });

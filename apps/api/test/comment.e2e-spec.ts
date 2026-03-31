@@ -1,68 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@/app.module';
-import { PrismaService } from '@/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { GoogleStrategy } from '@/auth/strategies/google.strategy';
-import { GithubStrategy } from '@/auth/strategies/github.strategy';
-
-// Stub strategies to avoid requiring real OAuth credentials in tests
-class GoogleStrategyStub {
-  name = 'google';
-}
-
-class GithubStrategyStub {
-  name = 'github';
-}
+import { createTestApp, createTestUser, closeTestApp, TestContext } from './helpers/setup';
 
 describe('Comment (e2e)', () => {
-  let app: INestApplication;
-  let prisma: PrismaService;
-  let jwtService: JwtService;
+  let ctx: TestContext;
   let token: string;
   let userId: string;
   let projectId: string;
   let versionId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(GoogleStrategy)
-      .useClass(GoogleStrategyStub)
-      .overrideProvider(GithubStrategy)
-      .useClass(GithubStrategyStub)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-
-    prisma = moduleFixture.get<PrismaService>(PrismaService);
-    jwtService = moduleFixture.get<JwtService>(JwtService);
-
-    await app.init();
+    ctx = await createTestApp();
   });
 
   beforeEach(async () => {
-    const user = await prisma.user.create({
-      data: {
-        email: `test-comment-e2e-${Date.now()}@example.com`,
-        name: 'Comment E2E User',
-        provider: 'GITHUB',
-        providerId: `comment-e2e-${Date.now()}`,
-      },
-    });
+    const { user, token: t } = await createTestUser(ctx.prisma, ctx.jwtService, 'comment');
     userId = user.id;
-    token = jwtService.sign({ sub: user.id, email: user.email });
+    token = t;
 
-    const project = await prisma.project.create({
+    const project = await ctx.prisma.project.create({
       data: {
         name: 'Comment Test Project',
         slug: `comment-test-project-${Date.now()}`,
@@ -71,7 +26,7 @@ describe('Comment (e2e)', () => {
     });
     projectId = project.id;
 
-    const version = await prisma.version.create({
+    const version = await ctx.prisma.version.create({
       data: {
         projectId,
         versionName: 'v1.0',
@@ -84,24 +39,17 @@ describe('Comment (e2e)', () => {
   });
 
   afterEach(async () => {
-    await prisma.comment.deleteMany({ where: { versionId } });
-    await prisma.version.deleteMany({ where: { projectId } });
-    await prisma.project.deleteMany({ where: { ownerId: userId } });
-    await prisma.user.deleteMany({ where: { id: userId } });
+    await ctx.prisma.comment.deleteMany({ where: { versionId } });
+    await ctx.prisma.version.deleteMany({ where: { projectId } });
+    await ctx.prisma.project.deleteMany({ where: { ownerId: userId } });
+    await ctx.prisma.user.deleteMany({ where: { id: userId } });
   });
 
-  afterAll(async () => {
-    if (prisma) {
-      await prisma.$disconnect();
-    }
-    if (app) {
-      await app.close();
-    }
-  });
+  afterAll(() => closeTestApp(ctx));
 
   describe('POST /versions/:versionId/comments', () => {
     it('should create a comment for an authenticated user', async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -122,7 +70,7 @@ describe('Comment (e2e)', () => {
     });
 
     it('should create a comment for a guest with guestName', async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .send({
           content: 'Guest comment here',
@@ -143,7 +91,7 @@ describe('Comment (e2e)', () => {
 
     it('should create a comment with selectionArea (drag)', async () => {
       const selectionArea = { x: 10, y: 20, width: 100, height: 50 };
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -158,8 +106,7 @@ describe('Comment (e2e)', () => {
     });
 
     it('should create a reply with parentId', async () => {
-      // First create a root comment
-      const parentResponse = await request(app.getHttpServer())
+      const parentResponse = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -171,7 +118,7 @@ describe('Comment (e2e)', () => {
 
       const parentId = parentResponse.body.id;
 
-      const replyResponse = await request(app.getHttpServer())
+      const replyResponse = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -187,11 +134,29 @@ describe('Comment (e2e)', () => {
         parentId,
       });
     });
+
+    it('should store and return cssSelector when provided', async () => {
+      const response = await request(ctx.app.getHttpServer())
+        .post(`/versions/${versionId}/comments`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ content: 'Selector test', posX: 50, posY: 50, cssSelector: '[data-testid="hero-title"]' })
+        .expect(201);
+      expect(response.body.cssSelector).toBe('[data-testid="hero-title"]');
+    });
+
+    it('should return null cssSelector when not provided', async () => {
+      const response = await request(ctx.app.getHttpServer())
+        .post(`/versions/${versionId}/comments`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ content: 'No selector', posX: 50, posY: 50 })
+        .expect(201);
+      expect(response.body.cssSelector).toBeNull();
+    });
   });
 
   describe('PATCH /versions/:versionId/comments/:id/resolve', () => {
     it('should toggle isResolved on a comment', async () => {
-      const createResponse = await request(app.getHttpServer())
+      const createResponse = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -204,15 +169,14 @@ describe('Comment (e2e)', () => {
       const commentId = createResponse.body.id;
       expect(createResponse.body.isResolved).toBe(false);
 
-      const resolveResponse = await request(app.getHttpServer())
+      const resolveResponse = await request(ctx.app.getHttpServer())
         .patch(`/versions/${versionId}/comments/${commentId}/resolve`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(resolveResponse.body.isResolved).toBe(true);
 
-      // Toggle back
-      const unresolveResponse = await request(app.getHttpServer())
+      const unresolveResponse = await request(ctx.app.getHttpServer())
         .patch(`/versions/${versionId}/comments/${commentId}/resolve`)
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
@@ -223,37 +187,82 @@ describe('Comment (e2e)', () => {
 
   describe('GET /versions/:versionId/comments', () => {
     it('should list root comments for a version', async () => {
-      // Create two root comments and one reply
-      const root1 = await request(app.getHttpServer())
+      const root1 = await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({ content: 'Root 1', posX: 1, posY: 1 })
         .expect(201);
 
-      await request(app.getHttpServer())
+      await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({ content: 'Root 2', posX: 2, posY: 2 })
         .expect(201);
 
-      await request(app.getHttpServer())
+      await request(ctx.app.getHttpServer())
         .post(`/versions/${versionId}/comments`)
         .set('Authorization', `Bearer ${token}`)
         .send({ content: 'Reply 1', posX: 1, posY: 1, parentId: root1.body.id })
         .expect(201);
 
-      const response = await request(app.getHttpServer())
+      const response = await request(ctx.app.getHttpServer())
         .get(`/versions/${versionId}/comments`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
-      // Only root comments (parentId=null) should be returned
       expect(response.body).toHaveLength(2);
       expect(response.body.every((c: any) => c.parentId === null)).toBe(true);
-      // Check replies are nested
       const rootWithReply = response.body.find((c: any) => c.id === root1.body.id);
       expect(rootWithReply?.replies).toHaveLength(1);
       expect(rootWithReply?.replies[0].content).toBe('Reply 1');
+    });
+  });
+
+  describe('DELETE /versions/:versionId/comments/:id', () => {
+    it('should delete own comment', async () => {
+      const create = await request(ctx.app.getHttpServer())
+        .post(`/versions/${versionId}/comments`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ content: 'To delete', posX: 5, posY: 5 })
+        .expect(201);
+
+      await request(ctx.app.getHttpServer())
+        .delete(`/versions/${versionId}/comments/${create.body.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      const list = await request(ctx.app.getHttpServer())
+        .get(`/versions/${versionId}/comments`)
+        .expect(200);
+
+      expect(list.body).toHaveLength(0);
+    });
+
+    it('should return 404 when deleting another user\'s comment', async () => {
+      const comment = await ctx.prisma.comment.create({
+        data: { versionId, authorId: userId, content: 'Protected', posX: 5, posY: 5 },
+      });
+
+      const { user: other, token: otherToken } = await createTestUser(
+        ctx.prisma, ctx.jwtService, 'other-comment',
+      );
+
+      await request(ctx.app.getHttpServer())
+        .delete(`/versions/${versionId}/comments/${comment.id}`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .expect(404);
+
+      await ctx.prisma.user.delete({ where: { id: other.id } });
+    });
+
+    it('should return 401 without token', async () => {
+      const comment = await ctx.prisma.comment.create({
+        data: { versionId, authorId: userId, content: 'Auth required', posX: 5, posY: 5 },
+      });
+
+      return request(ctx.app.getHttpServer())
+        .delete(`/versions/${versionId}/comments/${comment.id}`)
+        .expect(401);
     });
   });
 });
