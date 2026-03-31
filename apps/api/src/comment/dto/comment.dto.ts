@@ -27,6 +27,10 @@ export class CreateCommentDto {
   @IsOptional()
   pageUrl?: string;
 
+  @IsString()
+  @IsOptional()
+  cssSelector?: string;
+
   @IsUUID()
   @IsOptional()
   parentId?: string;
