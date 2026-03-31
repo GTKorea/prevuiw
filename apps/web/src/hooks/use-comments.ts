@@ -122,8 +122,9 @@ export function useCommentSocket(versionId: string) {
 
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
   }, [versionId, queryClient]);
 
-  return { onlineCount };
+  return { onlineCount, socketRef };
 }

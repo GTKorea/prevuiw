@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Copy, Check, AlertCircle } from "lucide-react";
 import { useProject } from "@/hooks/use-versions";
 import { SDK_SNIPPET } from "@/lib/sdk-snippet";
@@ -17,6 +17,7 @@ import { ReviewToolbar } from "@/components/review/review-toolbar";
 import { IframeContainer } from "@/components/review/iframe-container";
 import { CommentOverlay } from "@/components/review/comment-overlay";
 import { CommentSidebar } from "@/components/review/comment-sidebar";
+import { CursorOverlay } from "@/components/review/cursor-overlay";
 import { ScreenshotViewer } from "@/components/review/screenshot-viewer";
 import {
   GuestNameDialog,
@@ -33,8 +34,9 @@ export default function ReviewPage() {
   const { data: comments = [], isLoading: commentsLoading } =
     useComments(versionId);
   const createComment = useCreateComment(versionId);
-  const { onlineCount } = useCommentSocket(versionId);
+  const { onlineCount, socketRef } = useCommentSocket(versionId);
   const { setMode, setIframePageUrl, iframePageUrl, setSdkDetected } = useCommentStore();
+  const contentAreaRef = useRef<HTMLDivElement>(null);
 
   // Listen for page URL changes and SDK handshake
   useEffect(() => {
@@ -186,6 +188,8 @@ export default function ReviewPage() {
   const showProxyIframe = isImmutable && !proxyFailed;
   const showProxyFailedNoScreenshots = isImmutable && proxyFailed && !hasScreenshots;
 
+  const cursorUserName = user?.name || getGuestName() || "Anonymous";
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
       <ReviewToolbar
@@ -226,7 +230,12 @@ export default function ReviewPage() {
 
       <div className="flex flex-1 min-h-0">
         {/* Main content area */}
-        <div className="flex-1 relative min-w-0">
+        <div className="flex-1 relative min-w-0" ref={contentAreaRef}>
+          <CursorOverlay
+            socketRef={socketRef}
+            userName={cursorUserName}
+            trackRef={contentAreaRef}
+          />
           {showScreenshotFallback ? (
             <>
               <CommentOverlay
