@@ -5,7 +5,7 @@ export class CreateVersionDto {
   @IsNotEmpty()
   versionName: string;
 
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   url: string;
 
   @IsString()

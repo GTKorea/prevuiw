@@ -5,7 +5,7 @@ export class CreateProjectDto {
   @IsNotEmpty()
   name: string;
 
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   @IsOptional()
   url?: string;
 }
