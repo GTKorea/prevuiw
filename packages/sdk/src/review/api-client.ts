@@ -19,6 +19,29 @@ export class ApiClient {
     return res.json();
   }
 
+  async createReply(
+    versionId: string,
+    data: {
+      content: string;
+      parentId: string;
+      guestName: string;
+    }
+  ): Promise<CommentData | null> {
+    const res = await fetch(`${this.apiUrl}/versions/${versionId}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: data.content,
+        posX: 0,
+        posY: 0,
+        parentId: data.parentId,
+        guestName: data.guestName,
+      }),
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
   async createComment(
     versionId: string,
     data: {

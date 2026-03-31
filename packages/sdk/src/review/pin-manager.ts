@@ -9,6 +9,7 @@ export class PinManager {
   private expandedPopovers: HTMLDivElement[] = [];
   private allExpanded = false;
   private commentsRef: CommentData[] = [];
+  private onReply: ((commentId: string, content: string) => Promise<void>) | null = null;
 
   constructor(private shadowRoot: ShadowRoot) {
     this.container = document.createElement("div");
@@ -112,6 +113,65 @@ export class PinManager {
 
     popover.appendChild(header);
     popover.appendChild(content);
+
+    // Replies section
+    if (comment.replies && comment.replies.length > 0) {
+      const repliesDiv = document.createElement("div");
+      repliesDiv.className = "prevuiw-replies";
+
+      comment.replies.forEach((reply) => {
+        const replyEl = document.createElement("div");
+        replyEl.className = "prevuiw-reply";
+
+        const replyHeader = document.createElement("div");
+        const replyAuthor = document.createElement("span");
+        replyAuthor.className = "prevuiw-reply-author";
+        replyAuthor.textContent = reply.author?.name || reply.guestName || "Anonymous";
+        const replyTime = document.createElement("span");
+        replyTime.className = "prevuiw-reply-time";
+        replyTime.textContent = " · " + this.formatTime(reply.createdAt);
+        replyHeader.appendChild(replyAuthor);
+        replyHeader.appendChild(replyTime);
+
+        const replyContent = document.createElement("div");
+        replyContent.className = "prevuiw-reply-content";
+        replyContent.textContent = reply.content;
+
+        replyEl.appendChild(replyHeader);
+        replyEl.appendChild(replyContent);
+        repliesDiv.appendChild(replyEl);
+      });
+
+      popover.appendChild(repliesDiv);
+    }
+
+    // Reply input (only for click popovers, not hover)
+    if (showClose) {
+      const replyInputDiv = document.createElement("div");
+      replyInputDiv.className = "prevuiw-reply-input";
+
+      const replyInput = document.createElement("input");
+      replyInput.placeholder = "Reply...";
+
+      const replyBtn = document.createElement("button");
+      replyBtn.textContent = "Reply";
+      replyBtn.addEventListener("click", async () => {
+        const text = replyInput.value.trim();
+        if (!text || !this.onReply) return;
+        replyBtn.textContent = "...";
+        await this.onReply(comment.id, text);
+        replyBtn.textContent = "Reply";
+        replyInput.value = "";
+      });
+
+      replyInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") replyBtn.click();
+      });
+
+      replyInputDiv.appendChild(replyInput);
+      replyInputDiv.appendChild(replyBtn);
+      popover.appendChild(replyInputDiv);
+    }
 
     const pinLeft = parseInt(pinEl.style.left) || 0;
     const pinTop = parseInt(pinEl.style.top) || 0;
@@ -238,6 +298,10 @@ export class PinManager {
   private collapseAll() {
     this.expandedPopovers.forEach((p) => p.remove());
     this.expandedPopovers = [];
+  }
+
+  setOnReply(callback: (commentId: string, content: string) => Promise<void>) {
+    this.onReply = callback;
   }
 
   setVisible(visible: boolean) {

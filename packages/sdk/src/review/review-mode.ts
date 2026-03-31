@@ -85,6 +85,23 @@ export async function initReviewMode(config: PrevuiwConfig) {
   comments = await apiClient.getComments(versionId);
   pinManager.renderPins(comments);
 
+  pinManager.setOnReply(async (commentId, content) => {
+    if (!apiClient || !versionId) return;
+    const reply = await apiClient.createReply(versionId, {
+      content,
+      parentId: commentId,
+      guestName: reviewerName,
+    });
+    if (reply) {
+      const parent = comments.find((c) => c.id === commentId);
+      if (parent) {
+        if (!parent.replies) parent.replies = [];
+        parent.replies.push(reply);
+        pinManager?.renderPins(comments);
+      }
+    }
+  });
+
   // Connect WebSocket
   wsClient = new WsClient(config.apiUrl, config.projectKey, versionId, reviewerName);
 

@@ -21,6 +21,7 @@ export interface CommentData {
   isResolved: boolean;
   author: { id: string; name: string; avatarUrl: string | null } | null;
   createdAt: string;
+  replies?: CommentData[];
 }
 
 export interface CursorInfo {

@@ -209,6 +209,71 @@ export const SDK_STYLES = `
 
   .prevuiw-popover-close:hover { background: #f5f5f5; color: #333; }
 
+  .prevuiw-replies {
+    margin-top: 10px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 8px;
+  }
+
+  .prevuiw-reply {
+    padding: 6px 0;
+    border-bottom: 1px solid #f8f8f8;
+  }
+
+  .prevuiw-reply:last-child { border-bottom: none; }
+
+  .prevuiw-reply-author {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .prevuiw-reply-time {
+    font-size: 10px;
+    color: #aaa;
+  }
+
+  .prevuiw-reply-content {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #444;
+    margin-top: 2px;
+  }
+
+  .prevuiw-reply-input {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    align-items: flex-end;
+  }
+
+  .prevuiw-reply-input input {
+    all: unset;
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .prevuiw-reply-input input:focus {
+    border-color: #3b82f6;
+  }
+
+  .prevuiw-reply-input button {
+    all: unset;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .prevuiw-reply-input button:hover { background: #2563eb; }
+
   .prevuiw-name-overlay {
     position: fixed;
     top: 0;
