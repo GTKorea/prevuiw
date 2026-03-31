@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 
 const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
@@ -10,11 +11,25 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
+class CorsIoAdapter extends IoAdapter {
+  createIOServer(port: number, options?: any) {
+    return super.createIOServer(port, {
+      ...options,
+      cors: {
+        origin: true,
+        credentials: true,
+      },
+    });
+  }
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.useWebSocketAdapter(new CorsIoAdapter(app));
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: true,
     credentials: true,
   });
 
