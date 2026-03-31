@@ -1,9 +1,12 @@
 {
   "name": "@prevuiw/sdk",
   "version": "0.1.0",
-  "description": "Prevuiw scroll & URL tracking SDK for iframe-embedded sites",
+  "description": "Prevuiw SDK — embeddable website review overlay with real-time collaboration",
   "main": "dist/index.global.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "sideEffects": true,
+  "keywords": ["website-review", "feedback", "collaboration", "sdk", "annotation"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
@@ -16,5 +19,12 @@
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GTKorea/prevuiw"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
