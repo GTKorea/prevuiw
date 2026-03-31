@@ -17,10 +17,54 @@ let versionId: string | null = null;
 let commentInput: HTMLDivElement | null = null;
 let reviewerName = "Anonymous";
 
-export async function initReviewMode(config: PrevuiwConfig) {
-  reviewerName = prompt("Enter your name for this review session:") || "Anonymous";
+function askReviewerName(shadowRoot: ShadowRoot): Promise<string> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "prevuiw-name-overlay";
 
+    const card = document.createElement("div");
+    card.className = "prevuiw-name-card";
+
+    const title = document.createElement("h2");
+    title.textContent = "Join Review Session";
+
+    const subtitle = document.createElement("p");
+    subtitle.textContent = "Enter your name to start reviewing this page";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Your name";
+    input.autofocus = true;
+
+    const btn = document.createElement("button");
+    btn.className = "btn-start";
+    btn.textContent = "Start Review";
+
+    function submit() {
+      const name = input.value.trim() || "Anonymous";
+      overlay.remove();
+      resolve(name);
+    }
+
+    btn.addEventListener("click", submit);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submit();
+    });
+
+    card.appendChild(title);
+    card.appendChild(subtitle);
+    card.appendChild(input);
+    card.appendChild(btn);
+    overlay.appendChild(card);
+    shadowRoot.appendChild(overlay);
+
+    setTimeout(() => input.focus(), 50);
+  });
+}
+
+export async function initReviewMode(config: PrevuiwConfig) {
   const shadowRoot = createShadowHost();
+  reviewerName = await askReviewerName(shadowRoot);
   apiClient = new ApiClient(config.apiUrl, config.projectKey);
 
   // Resolve version
