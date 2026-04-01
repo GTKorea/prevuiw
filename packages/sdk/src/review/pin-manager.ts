@@ -11,6 +11,7 @@ export class PinManager {
   private commentsRef: CommentData[] = [];
   private onReply: ((commentId: string, content: string) => Promise<void>) | null = null;
   private onResolve: ((commentId: string) => void) | null = null;
+  private onEmojiAdd: ((commentId: string, emoji: string) => void) | null = null;
 
   constructor(private shadowRoot: ShadowRoot) {
     this.container = document.createElement("div");
@@ -135,6 +136,38 @@ export class PinManager {
       const actions = document.createElement("div");
       actions.className = "prevuiw-popover-actions";
 
+      // Emoji picker
+      const emojiWrap = document.createElement("div");
+      emojiWrap.style.cssText = "position:relative;display:inline-flex;";
+
+      const emojiBtn = document.createElement("button");
+      emojiBtn.className = "resolve-btn";
+      emojiBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`;
+
+      const emojiPicker = document.createElement("div");
+      emojiPicker.className = "prevuiw-emoji-picker";
+      emojiPicker.style.display = "none";
+
+      const EMOJIS = ["\uD83D\uDC4D", "\uD83D\uDC4E", "\u2764\uFE0F", "\uD83D\uDE02", "\uD83D\uDE2E", "\uD83C\uDF89"];
+      EMOJIS.forEach(emoji => {
+        const btn = document.createElement("button");
+        btn.textContent = emoji;
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.onEmojiAdd?.(comment.id, emoji);
+          emojiPicker.style.display = "none";
+        });
+        emojiPicker.appendChild(btn);
+      });
+
+      emojiBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        emojiPicker.style.display = emojiPicker.style.display === "none" ? "flex" : "none";
+      });
+
+      emojiWrap.appendChild(emojiBtn);
+      emojiWrap.appendChild(emojiPicker);
+
       // Resolve button
       const resolveBtn = document.createElement("button");
       resolveBtn.className = comment.isResolved ? "resolve-btn resolved" : "resolve-btn";
@@ -147,6 +180,7 @@ export class PinManager {
       });
 
       actions.appendChild(resolveBtn);
+      actions.appendChild(emojiWrap);
       popover.appendChild(actions);
     }
 
@@ -342,6 +376,10 @@ export class PinManager {
 
   setOnResolve(callback: (commentId: string) => void) {
     this.onResolve = callback;
+  }
+
+  setOnEmojiAdd(callback: (commentId: string, emoji: string) => void) {
+    this.onEmojiAdd = callback;
   }
 
   setVisible(visible: boolean) {

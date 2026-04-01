@@ -109,6 +109,18 @@ export async function initReviewMode(config: PrevuiwConfig) {
   };
 
   pinManager.setOnReply(handleReply);
+  const handleEmojiAdd = (commentId: string, emoji: string) => {
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment) return;
+    if (!comment.reactions) comment.reactions = [];
+    comment.reactions.push({ emoji, userId: "guest" });
+    pinManager?.renderPins(comments);
+    sidebar?.updateComments(comments);
+  };
+
+  pinManager.setOnEmojiAdd(handleEmojiAdd);
+  sidebar.setOnEmojiAdd(handleEmojiAdd);
+
   pinManager.setOnResolve(async (commentId) => {
     if (!apiClient || !versionId) return;
     const updated = await apiClient.resolveComment(versionId, commentId);

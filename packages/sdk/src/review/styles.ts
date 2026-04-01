@@ -276,6 +276,32 @@ export const SDK_STYLES = `
   }
 
   .prevuiw-popover-actions .resolve-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .prevuiw-emoji-picker {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+    display: flex;
+    gap: 2px;
+    background: #2c2c2e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 50;
+  }
+
+  .prevuiw-emoji-picker button {
+    all: unset;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.1s;
+  }
+
+  .prevuiw-emoji-picker button:hover { background: rgba(255,255,255,0.1); }
   .prevuiw-popover-actions .resolve-btn.resolved { color: #10b981; }
 
   .prevuiw-replies {

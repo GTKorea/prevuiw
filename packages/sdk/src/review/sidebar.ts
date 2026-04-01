@@ -11,6 +11,7 @@ export class Sidebar {
   private onPinClick: ((commentId: string) => void) | null = null;
   private onReply: ((commentId: string, content: string) => Promise<void>) | null = null;
   private onResolve: ((commentId: string) => void) | null = null;
+  private onEmojiAdd: ((commentId: string, emoji: string) => void) | null = null;
 
   constructor(private shadowRoot: ShadowRoot) {
     this.el = document.createElement("div");
@@ -69,6 +70,7 @@ export class Sidebar {
   setOnPinClick(cb: (commentId: string) => void) { this.onPinClick = cb; }
   setOnReply(cb: (commentId: string, content: string) => Promise<void>) { this.onReply = cb; }
   setOnResolve(cb: (commentId: string) => void) { this.onResolve = cb; }
+  setOnEmojiAdd(cb: (commentId: string, emoji: string) => void) { this.onEmojiAdd = cb; }
 
   toggle(open?: boolean) {
     this.isOpen = open ?? !this.isOpen;
@@ -217,9 +219,38 @@ export class Sidebar {
       replyWrap.appendChild(replyInput);
       replyWrap.appendChild(sendBtn);
 
+      // Emoji picker button
+      const emojiBtn = document.createElement("button");
+      emojiBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`;
+      emojiBtn.title = "Add reaction";
+
+      const emojiPicker = document.createElement("div");
+      emojiPicker.className = "prevuiw-emoji-picker";
+      emojiPicker.style.display = "none";
+
+      const EMOJIS = ["\uD83D\uDC4D", "\uD83D\uDC4E", "\u2764\uFE0F", "\uD83D\uDE02", "\uD83D\uDE2E", "\uD83C\uDF89"];
+      EMOJIS.forEach(emoji => {
+        const btn = document.createElement("button");
+        btn.textContent = emoji;
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.onEmojiAdd?.(comment.id, emoji);
+          emojiPicker.style.display = "none";
+        });
+        emojiPicker.appendChild(btn);
+      });
+
+      emojiBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const show = emojiPicker.style.display === "none";
+        emojiPicker.style.display = show ? "flex" : "none";
+      });
+
       actions.appendChild(resolveBtn);
       actions.appendChild(replyBtn);
+      actions.appendChild(emojiBtn);
       content.appendChild(actions);
+      content.appendChild(emojiPicker);
       content.appendChild(replyWrap);
 
       // Replies list
