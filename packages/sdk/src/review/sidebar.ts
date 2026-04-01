@@ -10,6 +10,7 @@ export class Sidebar {
   private isOpen = false;
   private onPinClick: ((commentId: string) => void) | null = null;
   private onReply: ((commentId: string, content: string) => Promise<void>) | null = null;
+  private onResolve: ((commentId: string) => void) | null = null;
 
   constructor(private shadowRoot: ShadowRoot) {
     this.el = document.createElement("div");
@@ -67,6 +68,7 @@ export class Sidebar {
 
   setOnPinClick(cb: (commentId: string) => void) { this.onPinClick = cb; }
   setOnReply(cb: (commentId: string, content: string) => Promise<void>) { this.onReply = cb; }
+  setOnResolve(cb: (commentId: string) => void) { this.onResolve = cb; }
 
   toggle(open?: boolean) {
     this.isOpen = open ?? !this.isOpen;
@@ -132,31 +134,113 @@ export class Sidebar {
       text.className = "prevuiw-sidebar-text";
       text.textContent = comment.content;
 
-      // Reply count
-      const replyCount = comment.replies?.length || 0;
-      if (replyCount > 0) {
-        const replies = document.createElement("div");
-        replies.className = "prevuiw-sidebar-replies";
-        replies.textContent = `${replyCount} ${replyCount === 1 ? "reply" : "replies"}`;
-        content.appendChild(meta);
-        content.appendChild(text);
-        content.appendChild(replies);
-      } else {
-        content.appendChild(meta);
-        content.appendChild(text);
+      content.appendChild(meta);
+      content.appendChild(text);
+
+      // Reactions
+      if (comment.reactions && comment.reactions.length > 0) {
+        const reactionsDiv = document.createElement("div");
+        reactionsDiv.className = "prevuiw-sidebar-reactions";
+        const grouped: Record<string, number> = {};
+        comment.reactions.forEach(r => { grouped[r.emoji] = (grouped[r.emoji] || 0) + 1; });
+        Object.entries(grouped).forEach(([emoji, count]) => {
+          const badge = document.createElement("span");
+          badge.className = "prevuiw-reaction-badge";
+          badge.textContent = `${emoji} ${count}`;
+          reactionsDiv.appendChild(badge);
+        });
+        content.appendChild(reactionsDiv);
       }
 
-      // Status dot
+      // Actions row
+      const actions = document.createElement("div");
+      actions.className = "prevuiw-sidebar-actions";
+
+      const resolveBtn = document.createElement("button");
+      resolveBtn.className = comment.isResolved ? "resolved" : "";
+      resolveBtn.innerHTML = comment.isResolved
+        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+        : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`;
+      resolveBtn.title = comment.isResolved ? "Reopen" : "Resolve";
+      resolveBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.onResolve?.(comment.id);
+      });
+
+      const replyBtn = document.createElement("button");
+      replyBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>`;
+      replyBtn.title = "Reply";
+
+      const replyCount = comment.replies?.length || 0;
+      if (replyCount > 0) {
+        const countSpan = document.createElement("span");
+        countSpan.style.cssText = "font-size:10px;color:#888;margin-left:2px;";
+        countSpan.textContent = String(replyCount);
+        replyBtn.appendChild(countSpan);
+      }
+
+      // Reply input (toggled)
+      const replyWrap = document.createElement("div");
+      replyWrap.className = "prevuiw-sidebar-reply-wrap";
+      replyWrap.style.display = "none";
+
+      const replyInput = document.createElement("input");
+      replyInput.className = "prevuiw-sidebar-reply-input";
+      replyInput.placeholder = "Reply...";
+
+      const sendBtn = document.createElement("button");
+      sendBtn.className = "prevuiw-sidebar-reply-send";
+      sendBtn.textContent = "Send";
+      sendBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const val = replyInput.value.trim();
+        if (!val || !this.onReply) return;
+        sendBtn.textContent = "...";
+        await this.onReply(comment.id, val);
+        sendBtn.textContent = "Send";
+        replyInput.value = "";
+        replyWrap.style.display = "none";
+      });
+
+      replyInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendBtn.click();
+      });
+      replyInput.addEventListener("click", (e) => e.stopPropagation());
+
+      replyBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const show = replyWrap.style.display === "none";
+        replyWrap.style.display = show ? "flex" : "none";
+        if (show) setTimeout(() => replyInput.focus(), 50);
+      });
+
+      replyWrap.appendChild(replyInput);
+      replyWrap.appendChild(sendBtn);
+
+      actions.appendChild(resolveBtn);
+      actions.appendChild(replyBtn);
+      content.appendChild(actions);
+      content.appendChild(replyWrap);
+
+      // Replies list
+      if (comment.replies && comment.replies.length > 0) {
+        const repliesList = document.createElement("div");
+        repliesList.className = "prevuiw-sidebar-replies-list";
+        comment.replies.forEach(reply => {
+          const r = document.createElement("div");
+          r.className = "prevuiw-sidebar-reply-item";
+          const rAuthor = reply.author?.name || reply.guestName || "Anonymous";
+          r.innerHTML = `<span class="prevuiw-reply-author">${rAuthor}</span> <span class="prevuiw-reply-time">${this.formatTime(reply.createdAt)}</span><div class="prevuiw-reply-content">${reply.content}</div>`;
+          repliesList.appendChild(r);
+        });
+        content.appendChild(repliesList);
+      }
+
+      item.appendChild(num);
+      item.appendChild(content);
+
       if (comment.isResolved) {
-        const dot = document.createElement("div");
-        dot.className = "prevuiw-sidebar-resolved";
-        dot.title = "Resolved";
-        item.appendChild(num);
-        item.appendChild(content);
-        item.appendChild(dot);
-      } else {
-        item.appendChild(num);
-        item.appendChild(content);
+        num.style.background = "#10b981";
       }
 
       this.listEl.appendChild(item);
