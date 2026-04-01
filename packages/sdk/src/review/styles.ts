@@ -82,8 +82,8 @@ export const SDK_STYLES = `
     width: 28px;
     height: 28px;
     border-radius: 50% 50% 50% 0;
-    background: #3b82f6;
-    border: 2px solid #fff;
+    background: #e5e5e5;
+    border: 2px solid rgba(0,0,0,0.2);
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     transform: rotate(-45deg) translate(-50%, -50%);
     cursor: pointer;
@@ -92,13 +92,13 @@ export const SDK_STYLES = `
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    color: #fff;
+    color: #1a1a1a;
     transition: transform 0.15s;
   }
 
   .prevuiw-pin span { transform: rotate(45deg); }
   .prevuiw-pin:hover { transform: rotate(-45deg) translate(-50%, -50%) scale(1.15); }
-  .prevuiw-pin.warn { background: #f59e0b; }
+  .prevuiw-pin.warn { background: #f59e0b; color: #1a1a1a; }
 
   .prevuiw-cursor {
     position: absolute;
@@ -129,9 +129,9 @@ export const SDK_STYLES = `
   .prevuiw-highlight {
     position: fixed;
     pointer-events: none;
-    border: 2px solid #3b82f6;
+    border: 2px solid rgba(229,229,229,0.6);
     border-radius: 4px;
-    background: rgba(59, 130, 246, 0.08);
+    background: rgba(229,229,229,0.08);
     z-index: 1;
     transition: all 0.05s;
   }
@@ -177,8 +177,8 @@ export const SDK_STYLES = `
 
   .prevuiw-comment-input .btn-cancel { color: #888; }
   .prevuiw-comment-input .btn-cancel:hover { background: rgba(255,255,255,0.08); }
-  .prevuiw-comment-input .btn-submit { background: #3b82f6; color: #fff; }
-  .prevuiw-comment-input .btn-submit:hover { background: #2563eb; }
+  .prevuiw-comment-input .btn-submit { background: #e5e5e5; color: #1a1a1a; }
+  .prevuiw-comment-input .btn-submit:hover { background: #fff; }
 
   .prevuiw-popover {
     position: absolute;
@@ -285,22 +285,22 @@ export const SDK_STYLES = `
   }
 
   .prevuiw-reply-input input:focus {
-    border-color: #3b82f6;
+    border-color: rgba(255,255,255,0.4);
   }
 
   .prevuiw-reply-input button {
     all: unset;
     cursor: pointer;
     padding: 6px 10px;
-    background: #3b82f6;
-    color: #fff;
+    background: #e5e5e5;
+    color: #1a1a1a;
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
   }
 
-  .prevuiw-reply-input button:hover { background: #2563eb; }
+  .prevuiw-reply-input button:hover { background: #fff; }
 
   .prevuiw-name-overlay {
     position: fixed;
@@ -354,8 +354,8 @@ export const SDK_STYLES = `
   }
 
   .prevuiw-name-card input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
   }
 
   .prevuiw-name-card .btn-start {
@@ -363,8 +363,8 @@ export const SDK_STYLES = `
     cursor: pointer;
     width: 100%;
     padding: 10px;
-    background: #3b82f6;
-    color: #fff;
+    background: #e5e5e5;
+    color: #1a1a1a;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
@@ -373,7 +373,7 @@ export const SDK_STYLES = `
     text-align: center;
   }
 
-  .prevuiw-name-card .btn-start:hover { background: #2563eb; }
+  .prevuiw-name-card .btn-start:hover { background: #fff; }
 
   .prevuiw-offline {
     position: fixed;
