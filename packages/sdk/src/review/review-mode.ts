@@ -3,6 +3,7 @@ import { createShadowHost, destroyShadowHost } from "./shadow-host";
 import { Toolbar, ToolbarMode } from "./toolbar";
 import { PinManager } from "./pin-manager";
 import { CursorLayer } from "./cursor-layer";
+import { Sidebar } from "./sidebar";
 import { startPicker, stopPicker } from "./element-picker";
 import { ApiClient } from "./api-client";
 import { WsClient } from "./ws-client";
@@ -10,6 +11,7 @@ import { WsClient } from "./ws-client";
 let toolbar: Toolbar | null = null;
 let pinManager: PinManager | null = null;
 let cursorLayer: CursorLayer | null = null;
+let sidebar: Sidebar | null = null;
 let apiClient: ApiClient | null = null;
 let wsClient: WsClient | null = null;
 let comments: CommentData[] = [];
@@ -77,15 +79,18 @@ export async function initReviewMode(config: PrevuiwConfig) {
   versionId = resolved.versionId;
 
   // Create UI components
-  toolbar = new Toolbar(shadowRoot, handleModeChange, handlePinsToggle, handleExpandToggle);
+  toolbar = new Toolbar(shadowRoot, handleModeChange, handlePinsToggle, handleSidebarToggle);
   pinManager = new PinManager(shadowRoot);
   cursorLayer = new CursorLayer(shadowRoot);
+  sidebar = new Sidebar(shadowRoot);
 
   // Load existing comments
   comments = await apiClient.getComments(versionId);
   pinManager.renderPins(comments);
+  sidebar.updateComments(comments);
 
-  pinManager.setOnReply(async (commentId, content) => {
+  // Reply handler (shared between pins and sidebar)
+  const handleReply = async (commentId: string, content: string) => {
     if (!apiClient || !versionId) return;
     const reply = await apiClient.createReply(versionId, {
       content,
@@ -98,8 +103,22 @@ export async function initReviewMode(config: PrevuiwConfig) {
         if (!parent.replies) parent.replies = [];
         parent.replies.push(reply);
         pinManager?.renderPins(comments);
+        sidebar?.updateComments(comments);
       }
     }
+  };
+
+  pinManager.setOnReply(handleReply);
+  sidebar.setOnReply(handleReply);
+  sidebar.setOnPinClick((commentId) => {
+    // Scroll to pin position
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment) return;
+    const scrollWidth = document.documentElement.scrollWidth;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const x = (comment.posX / 100) * scrollWidth;
+    const y = (comment.posY / 100) * scrollHeight;
+    window.scrollTo({ left: x - window.innerWidth / 2, top: y - 200, behavior: "smooth" });
   });
 
   // Connect WebSocket
@@ -135,6 +154,7 @@ export async function initReviewMode(config: PrevuiwConfig) {
   wsClient.on("newComment", (comment: CommentData) => {
     comments.push(comment);
     pinManager?.renderPins(comments);
+    sidebar?.updateComments(comments);
   });
 
   await wsClient.connect();
@@ -152,8 +172,8 @@ function handlePinsToggle(visible: boolean) {
   pinManager?.setVisible(visible);
 }
 
-function handleExpandToggle(expanded: boolean) {
-  pinManager?.setAllExpanded(expanded, comments);
+function handleSidebarToggle() {
+  sidebar?.toggle();
 }
 
 function handleModeChange(mode: ToolbarMode) {
@@ -219,6 +239,7 @@ function showCommentInput(data: { selector: string; posX: number; posY: number; 
     if (comment) {
       comments.push(comment);
       pinManager?.renderPins(comments);
+      sidebar?.updateComments(comments);
     }
 
     closeCommentInput();

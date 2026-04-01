@@ -14,24 +14,23 @@ export class Toolbar {
   private browseBtn: HTMLButtonElement;
   private annotateBtn: HTMLButtonElement;
   private eyeToggleBtn: HTMLButtonElement;
-  private expandToggleBtn: HTMLButtonElement;
+  private sidebarToggleBtn: HTMLButtonElement;
   private statusEl: HTMLDivElement;
   private mode: ToolbarMode = "browse";
   private pinsVisible = true;
-  private allExpanded = false;
   private onModeChange: (mode: ToolbarMode) => void;
   private onPinsToggle: (visible: boolean) => void;
-  private onExpandToggle: (expanded: boolean) => void;
+  private onSidebarToggle: () => void;
 
   constructor(
     shadowRoot: ShadowRoot,
     onModeChange: (mode: ToolbarMode) => void,
     onPinsToggle: (visible: boolean) => void,
-    onExpandToggle: (expanded: boolean) => void,
+    onSidebarToggle: () => void,
   ) {
     this.onModeChange = onModeChange;
     this.onPinsToggle = onPinsToggle;
-    this.onExpandToggle = onExpandToggle;
+    this.onSidebarToggle = onSidebarToggle;
 
     this.el = document.createElement("div");
     this.el.className = "prevuiw-toolbar";
@@ -60,12 +59,12 @@ export class Toolbar {
     this.eyeToggleBtn.title = "Show/hide pins";
     this.eyeToggleBtn.addEventListener("click", () => this.togglePins());
 
-    // Expand toggle
-    this.expandToggleBtn = document.createElement("button");
-    this.expandToggleBtn.className = "icon-toggle";
-    this.expandToggleBtn.innerHTML = ICONS.panelRight;
-    this.expandToggleBtn.title = "Expand/collapse all comments";
-    this.expandToggleBtn.addEventListener("click", () => this.toggleExpand());
+    // Sidebar toggle
+    this.sidebarToggleBtn = document.createElement("button");
+    this.sidebarToggleBtn.className = "icon-toggle";
+    this.sidebarToggleBtn.innerHTML = ICONS.panelRight;
+    this.sidebarToggleBtn.title = "Toggle comment sidebar";
+    this.sidebarToggleBtn.addEventListener("click", () => this.onSidebarToggle());
 
     // Status
     this.statusEl = document.createElement("div");
@@ -77,7 +76,7 @@ export class Toolbar {
     this.el.appendChild(this.annotateBtn);
     this.el.appendChild(div2);
     this.el.appendChild(this.eyeToggleBtn);
-    this.el.appendChild(this.expandToggleBtn);
+    this.el.appendChild(this.sidebarToggleBtn);
     this.el.appendChild(this.statusEl);
 
     shadowRoot.appendChild(this.el);
@@ -94,12 +93,6 @@ export class Toolbar {
     this.eyeToggleBtn.className = this.pinsVisible ? "icon-toggle active" : "icon-toggle";
     this.eyeToggleBtn.innerHTML = this.pinsVisible ? ICONS.eye : ICONS.eyeOff;
     this.onPinsToggle(this.pinsVisible);
-  }
-
-  private toggleExpand() {
-    this.allExpanded = !this.allExpanded;
-    this.expandToggleBtn.className = this.allExpanded ? "icon-toggle active" : "icon-toggle";
-    this.onExpandToggle(this.allExpanded);
   }
 
   setMode(mode: ToolbarMode) {
