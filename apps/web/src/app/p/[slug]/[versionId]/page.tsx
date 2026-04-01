@@ -77,6 +77,7 @@ export default function ReviewPage() {
     content: string;
     posX: number;
     posY: number;
+    cssSelector?: string;
     selectionArea?: { x: number; y: number; width: number; height: number };
     parentId?: string;
   } | null>(null);
@@ -95,6 +96,7 @@ export default function ReviewPage() {
       content: string;
       posX: number;
       posY: number;
+      cssSelector?: string;
       selectionArea?: { x: number; y: number; width: number; height: number };
       pageUrl?: string;
       parentId?: string;

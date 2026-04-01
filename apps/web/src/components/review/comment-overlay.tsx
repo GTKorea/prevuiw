@@ -43,6 +43,7 @@ interface PendingComment {
   viewY: number;
   posX: number;
   posY: number;
+  cssSelector?: string;
   selectionArea?: { x: number; y: number; width: number; height: number };
   viewSelectionArea?: { x: number; y: number; width: number; height: number };
 }
@@ -53,6 +54,7 @@ interface CommentOverlayProps {
     content: string;
     posX: number;
     posY: number;
+    cssSelector?: string;
     selectionArea?: { x: number; y: number; width: number; height: number };
     pageUrl?: string;
   }) => void;
@@ -123,6 +125,40 @@ export function CommentOverlay({
       document.removeEventListener("visibilitychange", onBlur);
     };
   }, [setModifierHeld, pending, sdkDetected]);
+
+  // Send picker commands to iframe when mode changes
+  useEffect(() => {
+    const iframe = document.querySelector("iframe") as HTMLIFrameElement | null;
+    if (!iframe?.contentWindow) return;
+
+    if (mode === "commenting" && sdkDetected) {
+      iframe.contentWindow.postMessage({ type: "prevuiw:startPicker" }, "*");
+    } else {
+      iframe.contentWindow.postMessage({ type: "prevuiw:stopPicker" }, "*");
+    }
+  }, [mode, sdkDetected]);
+
+  // Listen for element picks from iframe SDK
+  useEffect(() => {
+    function handleElementPicked(e: MessageEvent) {
+      if (e.data?.type !== "prevuiw:elementPicked") return;
+      const { selector, posX, posY, viewX, viewY, pageUrl } = e.data;
+      setPending({
+        viewX,
+        viewY,
+        posX,
+        posY,
+        cssSelector: selector || undefined,
+      });
+
+      // Stop picker after pick
+      const iframe = document.querySelector("iframe") as HTMLIFrameElement | null;
+      iframe?.contentWindow?.postMessage({ type: "prevuiw:stopPicker" }, "*");
+    }
+
+    window.addEventListener("message", handleElementPicked);
+    return () => window.removeEventListener("message", handleElementPicked);
+  }, []);
 
   // "V" key to switch to browse/idle mode
   useEffect(() => {
@@ -369,6 +405,7 @@ export function CommentOverlay({
       content,
       posX: pending.posX,
       posY: pending.posY,
+      cssSelector: pending.cssSelector,
       selectionArea: pending.selectionArea,
       pageUrl: iframePageUrl ?? undefined,
     });
