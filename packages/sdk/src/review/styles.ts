@@ -11,7 +11,7 @@ export const SDK_STYLES = `
     pointer-events: none;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 14px;
-    color: #1a1a1a;
+    color: #e5e5e5;
   }
 
   .prevuiw-toolbar {
@@ -22,11 +22,13 @@ export const SDK_STYLES = `
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: rgba(28,28,30,0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     padding: 8px 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    color: #e5e5e5;
     z-index: 10;
   }
 
@@ -40,7 +42,7 @@ export const SDK_STYLES = `
     transition: background 0.15s;
   }
 
-  .prevuiw-toolbar button:hover { background: #f5f5f5; }
+  .prevuiw-toolbar button:hover { background: rgba(255,255,255,0.08); }
   .prevuiw-toolbar button.active { background: #3b82f6; color: #fff; }
   .prevuiw-toolbar button.active:hover { background: #2563eb; }
   .prevuiw-toolbar button.icon-toggle { font-size: 15px; padding: 6px 8px; }
@@ -116,10 +118,10 @@ export const SDK_STYLES = `
   .prevuiw-comment-input {
     position: absolute;
     pointer-events: auto;
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: #2c2c2e;
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     padding: 12px;
     width: 280px;
     z-index: 20;
@@ -133,6 +135,7 @@ export const SDK_STYLES = `
     line-height: 1.4;
     display: block;
     box-sizing: border-box;
+    color: #e5e5e5;
   }
 
   .prevuiw-comment-input .actions {
@@ -151,23 +154,24 @@ export const SDK_STYLES = `
     font-weight: 500;
   }
 
-  .prevuiw-comment-input .btn-cancel { color: #666; }
-  .prevuiw-comment-input .btn-cancel:hover { background: #f5f5f5; }
+  .prevuiw-comment-input .btn-cancel { color: #888; }
+  .prevuiw-comment-input .btn-cancel:hover { background: rgba(255,255,255,0.08); }
   .prevuiw-comment-input .btn-submit { background: #3b82f6; color: #fff; }
   .prevuiw-comment-input .btn-submit:hover { background: #2563eb; }
 
   .prevuiw-popover {
     position: absolute;
     pointer-events: auto;
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: #2c2c2e;
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     padding: 12px;
     width: 280px;
     z-index: 20;
     max-height: 300px;
     overflow-y: auto;
+    color: #e5e5e5;
   }
 
   .prevuiw-popover-header {
@@ -176,23 +180,24 @@ export const SDK_STYLES = `
     align-items: center;
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
   .prevuiw-popover-author {
     font-weight: 600;
     font-size: 13px;
+    color: #e5e5e5;
   }
 
   .prevuiw-popover-time {
     font-size: 11px;
-    color: #999;
+    color: #666;
   }
 
   .prevuiw-popover-content {
     font-size: 13px;
     line-height: 1.5;
-    color: #333;
+    color: #ccc;
     white-space: pre-wrap;
     word-break: break-word;
   }
@@ -201,23 +206,23 @@ export const SDK_STYLES = `
     all: unset;
     cursor: pointer;
     font-size: 16px;
-    color: #999;
+    color: #666;
     padding: 2px 6px;
     border-radius: 4px;
     line-height: 1;
   }
 
-  .prevuiw-popover-close:hover { background: #f5f5f5; color: #333; }
+  .prevuiw-popover-close:hover { background: rgba(255,255,255,0.08); color: #e5e5e5; }
 
   .prevuiw-replies {
     margin-top: 10px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid rgba(255,255,255,0.08);
     padding-top: 8px;
   }
 
   .prevuiw-reply {
     padding: 6px 0;
-    border-bottom: 1px solid #f8f8f8;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
   }
 
   .prevuiw-reply:last-child { border-bottom: none; }
@@ -225,18 +230,18 @@ export const SDK_STYLES = `
   .prevuiw-reply-author {
     font-size: 12px;
     font-weight: 600;
-    color: #555;
+    color: #ccc;
   }
 
   .prevuiw-reply-time {
     font-size: 10px;
-    color: #aaa;
+    color: #666;
   }
 
   .prevuiw-reply-content {
     font-size: 12px;
     line-height: 1.4;
-    color: #444;
+    color: #aaa;
     margin-top: 2px;
   }
 
@@ -251,9 +256,11 @@ export const SDK_STYLES = `
     all: unset;
     flex: 1;
     padding: 6px 10px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 6px;
     font-size: 12px;
+    background: #1c1c1e;
+    color: #e5e5e5;
   }
 
   .prevuiw-reply-input input:focus {
@@ -289,19 +296,20 @@ export const SDK_STYLES = `
   }
 
   .prevuiw-name-card {
-    background: #fff;
+    background: #2c2c2e;
     border-radius: 16px;
     padding: 32px;
     width: 360px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     text-align: center;
+    color: #e5e5e5;
   }
 
   .prevuiw-name-card h2 {
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 4px;
-    color: #1a1a1a;
+    color: #e5e5e5;
   }
 
   .prevuiw-name-card p {
@@ -314,17 +322,19 @@ export const SDK_STYLES = `
     all: unset;
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid #d1d5db;
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
     font-size: 14px;
     box-sizing: border-box;
     margin-bottom: 16px;
     text-align: left;
+    background: #1c1c1e;
+    color: #e5e5e5;
   }
 
   .prevuiw-name-card input:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
   }
 
   .prevuiw-name-card .btn-start {
@@ -349,12 +359,12 @@ export const SDK_STYLES = `
     top: 12px;
     right: 12px;
     pointer-events: auto;
-    background: #fef3cd;
-    border: 1px solid #ffc107;
+    background: rgba(255,193,7,0.1);
+    border: 1px solid rgba(255,193,7,0.3);
     border-radius: 8px;
     padding: 6px 12px;
     font-size: 12px;
-    color: #856404;
+    color: #ffc107;
     z-index: 15;
   }
 `;
