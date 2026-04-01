@@ -16,17 +16,18 @@ export const SDK_STYLES = `
 
   .prevuiw-toolbar {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     pointer-events: auto;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     background: rgba(28,28,30,0.95);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    padding: 8px 12px;
+    padding: 6px 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     color: #e5e5e5;
     z-index: 10;
@@ -35,19 +36,39 @@ export const SDK_STYLES = `
   .prevuiw-toolbar button {
     all: unset;
     cursor: pointer;
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .prevuiw-toolbar button svg { flex-shrink: 0; }
+  .prevuiw-toolbar button span { font-size: 12px; }
+  .prevuiw-toolbar button kbd {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    font-family: inherit;
+    margin-left: 2px;
   }
 
   .prevuiw-toolbar button:hover { background: rgba(255,255,255,0.08); }
-  .prevuiw-toolbar button.active { background: #3b82f6; color: #fff; }
-  .prevuiw-toolbar button.active:hover { background: #2563eb; }
-  .prevuiw-toolbar button.icon-toggle { font-size: 15px; padding: 6px 8px; }
+  .prevuiw-toolbar button.active { background: rgba(255,255,255,0.12); }
+  .prevuiw-toolbar button.active:hover { background: rgba(255,255,255,0.16); }
+  .prevuiw-toolbar button.icon-toggle { padding: 6px 8px; }
   .prevuiw-toolbar button.icon-toggle.active { background: transparent; color: inherit; }
   .prevuiw-toolbar button.icon-toggle:not(.active) { opacity: 0.4; }
+
+  .prevuiw-toolbar .divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
 
   .prevuiw-toolbar .status {
     font-size: 12px;
