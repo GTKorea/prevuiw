@@ -319,7 +319,10 @@ export function CommentOverlay({
     []
   );
 
-  const isActive = mode === "commenting" || modifierHeld;
+  // When SDK is detected and in commenting mode, let iframe handle the picking
+  // (overlay should not capture mouse events — iframe picker does it via postMessage)
+  const iframePicking = mode === "commenting" && sdkDetected && !pending;
+  const isActive = (mode === "commenting" && !iframePicking) || modifierHeld;
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
