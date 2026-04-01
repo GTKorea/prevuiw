@@ -191,7 +191,7 @@ export const SDK_STYLES = `
     width: 280px;
     z-index: 20;
     max-height: 300px;
-    overflow-y: auto;
+    overflow: visible;
     color: #e5e5e5;
   }
 
@@ -279,9 +279,9 @@ export const SDK_STYLES = `
 
   .prevuiw-emoji-picker {
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 0;
-    margin-bottom: 4px;
+    margin-top: 4px;
     display: flex;
     gap: 2px;
     background: #2c2c2e;
