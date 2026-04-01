@@ -22,6 +22,7 @@ export interface CommentData {
   author: { id: string; name: string; avatarUrl: string | null } | null;
   createdAt: string;
   replies?: CommentData[];
+  reactions?: { emoji: string; userId: string }[];
 }
 
 export interface CursorInfo {

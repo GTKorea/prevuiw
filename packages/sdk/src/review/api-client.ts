@@ -42,6 +42,14 @@ export class ApiClient {
     return res.json();
   }
 
+  async resolveComment(versionId: string, commentId: string): Promise<CommentData | null> {
+    const res = await fetch(`${this.apiUrl}/versions/${versionId}/comments/${commentId}/resolve`, {
+      method: "PATCH",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
   async createComment(
     versionId: string,
     data: {

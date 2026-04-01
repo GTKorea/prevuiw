@@ -47,7 +47,7 @@ export class CommentController {
   }
 
   @Patch(':id/resolve')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalAuthGuard)
   async resolve(
     @Param('versionId') versionId: string,
     @Param('id') id: string,

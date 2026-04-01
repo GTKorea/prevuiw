@@ -109,6 +109,18 @@ export async function initReviewMode(config: PrevuiwConfig) {
   };
 
   pinManager.setOnReply(handleReply);
+  pinManager.setOnResolve(async (commentId) => {
+    if (!apiClient || !versionId) return;
+    const updated = await apiClient.resolveComment(versionId, commentId);
+    if (updated) {
+      const idx = comments.findIndex(c => c.id === commentId);
+      if (idx >= 0) {
+        comments[idx].isResolved = updated.isResolved;
+        pinManager?.renderPins(comments);
+        sidebar?.updateComments(comments);
+      }
+    }
+  });
   sidebar.setOnReply(handleReply);
   sidebar.setOnPinClick((commentId) => {
     // Scroll to pin position

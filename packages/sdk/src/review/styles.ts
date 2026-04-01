@@ -235,6 +235,49 @@ export const SDK_STYLES = `
 
   .prevuiw-popover-close:hover { background: rgba(255,255,255,0.08); color: #e5e5e5; }
 
+  .prevuiw-reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .prevuiw-reaction-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px;
+    color: #ccc;
+  }
+
+  .prevuiw-popover-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .prevuiw-popover-actions .resolve-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #888;
+    transition: background 0.15s;
+  }
+
+  .prevuiw-popover-actions .resolve-btn:hover { background: rgba(255,255,255,0.08); }
+  .prevuiw-popover-actions .resolve-btn.resolved { color: #10b981; }
+
   .prevuiw-replies {
     margin-top: 10px;
     border-top: 1px solid rgba(255,255,255,0.08);

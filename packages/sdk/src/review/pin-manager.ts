@@ -10,6 +10,7 @@ export class PinManager {
   private allExpanded = false;
   private commentsRef: CommentData[] = [];
   private onReply: ((commentId: string, content: string) => Promise<void>) | null = null;
+  private onResolve: ((commentId: string) => void) | null = null;
 
   constructor(private shadowRoot: ShadowRoot) {
     this.container = document.createElement("div");
@@ -113,6 +114,41 @@ export class PinManager {
 
     popover.appendChild(header);
     popover.appendChild(content);
+
+    // Reactions display
+    if (comment.reactions && comment.reactions.length > 0) {
+      const reactionsDiv = document.createElement("div");
+      reactionsDiv.className = "prevuiw-reactions";
+      const grouped: Record<string, number> = {};
+      comment.reactions.forEach(r => { grouped[r.emoji] = (grouped[r.emoji] || 0) + 1; });
+      Object.entries(grouped).forEach(([emoji, count]) => {
+        const badge = document.createElement("span");
+        badge.className = "prevuiw-reaction-badge";
+        badge.textContent = `${emoji} ${count}`;
+        reactionsDiv.appendChild(badge);
+      });
+      popover.appendChild(reactionsDiv);
+    }
+
+    // Actions bar (only in click popover)
+    if (showClose) {
+      const actions = document.createElement("div");
+      actions.className = "prevuiw-popover-actions";
+
+      // Resolve button
+      const resolveBtn = document.createElement("button");
+      resolveBtn.className = comment.isResolved ? "resolve-btn resolved" : "resolve-btn";
+      resolveBtn.innerHTML = comment.isResolved
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Resolved</span>`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg><span>Resolve</span>`;
+      resolveBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.onResolve?.(comment.id);
+      });
+
+      actions.appendChild(resolveBtn);
+      popover.appendChild(actions);
+    }
 
     // Replies section
     if (comment.replies && comment.replies.length > 0) {
@@ -302,6 +338,10 @@ export class PinManager {
 
   setOnReply(callback: (commentId: string, content: string) => Promise<void>) {
     this.onReply = callback;
+  }
+
+  setOnResolve(callback: (commentId: string) => void) {
+    this.onResolve = callback;
   }
 
   setVisible(visible: boolean) {
