@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Comment } from "@/shared/types";
 import { cn } from "@/shared/lib";
+import { useI18n } from "@/i18n/context";
 
 interface Screenshot {
   id: string;
@@ -18,6 +19,7 @@ interface ScreenshotViewerProps {
 
 export function ScreenshotViewer({ screenshots, comments }: ScreenshotViewerProps) {
   const [activePage, setActivePage] = useState(screenshots[0]?.pageUrl || "");
+  const { t } = useI18n();
 
   // Get unique pages
   const pages = [...new Set(screenshots.map((s) => s.pageUrl))];
@@ -29,7 +31,7 @@ export function ScreenshotViewer({ screenshots, comments }: ScreenshotViewerProp
   if (screenshots.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
-        No screenshots available
+        {t("review.noScreenshotsAvailable")}
       </div>
     );
   }

@@ -12,6 +12,7 @@ import type { Viewport } from "@/shared/types";
 import { ReviewToolbar } from "@/components/review/review-toolbar";
 import { CommentSidebar } from "@/components/review/comment-sidebar";
 import { ScreenshotViewer } from "@/components/review/screenshot-viewer";
+import { useI18n } from "@/i18n/context";
 
 export default function ReviewPage() {
   const params = useParams();
@@ -23,6 +24,7 @@ export default function ReviewPage() {
   const { data: comments = [] } = useComments(versionId, viewport);
   const { onlineCount } = useCommentSocket(versionId);
   const { copied: linkCopied, copy: copyLink } = useCopyToClipboard();
+  const { t } = useI18n();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -45,7 +47,7 @@ export default function ReviewPage() {
   if (projectLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("common.loading")}</p>
       </div>
     );
   }
@@ -53,7 +55,7 @@ export default function ReviewPage() {
   if (!project || !version) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Version not found</p>
+        <p className="text-muted-foreground">{t("review.versionNotFound")}</p>
       </div>
     );
   }
@@ -100,7 +102,7 @@ export default function ReviewPage() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors cursor-pointer"
         >
           {linkCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-          {linkCopied ? "Copied!" : "Copy review URL"}
+          {linkCopied ? t("review.copied") : t("review.copyReviewUrl")}
         </button>
       </div>
 
@@ -110,11 +112,10 @@ export default function ReviewPage() {
             <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
               <div className="text-center max-w-md">
                 <p className="text-sm font-medium text-foreground mb-1">
-                  No screenshots yet for {VIEWPORT_CONFIG.find(v => v.key === viewport)?.label}
+                  {t("review.noScreenshots")} {VIEWPORT_CONFIG.find(v => v.key === viewport)?.label}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Screenshots are captured automatically when a reviewer leaves their first comment on a page.
-                  Share the review URL to get started.
+                  {t("review.screenshotHint")}
                 </p>
                 <div className="mt-4 p-3 bg-muted rounded-lg">
                   <p className="text-xs font-mono text-muted-foreground break-all">{reviewUrl}</p>

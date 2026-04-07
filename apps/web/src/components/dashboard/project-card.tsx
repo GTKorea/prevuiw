@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Card, CardContent, Badge } from "@/shared/ui";
 import { cn } from "@/shared/lib";
+import { useI18n } from "@/i18n/context";
 
 interface ProjectCardProps {
   name: string;
@@ -12,6 +13,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ name, slug, versionCount, sdkConnected, latestVersion }: ProjectCardProps) {
+  const { t } = useI18n();
   return (
     <Link href={`/p/${slug}`}>
       <Card className={cn(
@@ -25,10 +27,10 @@ export function ProjectCard({ name, slug, versionCount, sdkConnected, latestVers
               {sdkConnected ? (
                 <span className="flex items-center gap-1 text-[10px] text-green-500 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  Connected
+                  {t("project.connected")}
                 </span>
               ) : (
-                <span className="text-[10px] text-muted-foreground">Not connected</span>
+                <span className="text-[10px] text-muted-foreground">{t("project.notConnected")}</span>
               )}
             </div>
             <Badge variant="secondary" className="text-xs">
@@ -37,8 +39,8 @@ export function ProjectCard({ name, slug, versionCount, sdkConnected, latestVers
           </div>
           {latestVersion && (
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Latest: {latestVersion.versionName}</span>
-              <span>{latestVersion._count.comments} comments</span>
+              <span>{t("project.latest")}: {latestVersion.versionName}</span>
+              <span>{latestVersion._count.comments} {t("project.comments")}</span>
             </div>
           )}
         </CardContent>

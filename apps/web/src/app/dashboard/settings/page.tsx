@@ -4,6 +4,7 @@ import { useAuth } from "@/entities/auth";
 import { Avatar, AvatarFallback, AvatarImage, Button, Badge } from "@/shared/ui";
 import { LogOut, Trash2, Github } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from "@/i18n/context";
 
 function GoogleIcon() {
   return (
@@ -19,22 +20,23 @@ function GoogleIcon() {
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { t } = useI18n();
 
   if (!user) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t("common.loading")}</p>
       </div>
     );
   }
 
   return (
     <div className="p-6 max-w-2xl">
-      <h2 className="text-xl font-semibold mb-6">Settings</h2>
+      <h2 className="text-xl font-semibold mb-6">{t("settings.title")}</h2>
 
       {/* Profile */}
       <section className="mb-8">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Profile</h3>
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">{t("settings.profile")}</h3>
         <div className="border border-border rounded-lg p-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
@@ -51,37 +53,37 @@ export default function SettingsPage() {
 
       {/* Connected Accounts */}
       <section className="mb-8">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Connected Accounts</h3>
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">{t("settings.connectedAccounts")}</h3>
         <div className="border border-border rounded-lg divide-y divide-border">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <GoogleIcon />
-              <span className="text-sm font-medium">Google</span>
+              <span className="text-sm font-medium">{t("settings.google")}</span>
             </div>
-            <Badge variant="secondary" className="text-xs">Connected</Badge>
+            <Badge variant="secondary" className="text-xs">{t("settings.connected")}</Badge>
           </div>
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3">
               <Github className="size-4" />
-              <span className="text-sm font-medium">GitHub</span>
+              <span className="text-sm font-medium">{t("settings.github")}</span>
             </div>
-            <span className="text-xs text-muted-foreground">Not connected</span>
+            <span className="text-xs text-muted-foreground">{t("settings.notConnected")}</span>
           </div>
         </div>
       </section>
 
       {/* Session */}
       <section className="mb-8">
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Session</h3>
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">{t("settings.session")}</h3>
         <div className="border border-border rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Sign out</p>
-              <p className="text-xs text-muted-foreground">Sign out of your current session</p>
+              <p className="text-sm font-medium">{t("settings.signOut")}</p>
+              <p className="text-xs text-muted-foreground">{t("settings.signOutDesc")}</p>
             </div>
             <Button variant="outline" size="sm" onClick={logout} className="gap-1.5">
               <LogOut className="size-3.5" />
-              Sign out
+              {t("settings.signOut")}
             </Button>
           </div>
         </div>
@@ -89,21 +91,21 @@ export default function SettingsPage() {
 
       {/* Danger Zone */}
       <section>
-        <h3 className="text-sm font-medium text-destructive uppercase tracking-wide mb-3">Danger Zone</h3>
+        <h3 className="text-sm font-medium text-destructive uppercase tracking-wide mb-3">{t("settings.dangerZone")}</h3>
         <div className="border border-destructive/30 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Delete account</p>
-              <p className="text-xs text-muted-foreground">Permanently delete your account and all projects</p>
+              <p className="text-sm font-medium">{t("settings.deleteAccount")}</p>
+              <p className="text-xs text-muted-foreground">{t("settings.deleteAccountDesc")}</p>
             </div>
             {showDeleteConfirm ? (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(false)}>
-                  Cancel
+                  {t("settings.cancel")}
                 </Button>
                 <Button variant="destructive" size="sm" className="gap-1.5">
                   <Trash2 className="size-3.5" />
-                  Confirm
+                  {t("settings.confirm")}
                 </Button>
               </div>
             ) : (
@@ -114,7 +116,7 @@ export default function SettingsPage() {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <Trash2 className="size-3.5" />
-                Delete
+                {t("settings.delete")}
               </Button>
             )}
           </div>

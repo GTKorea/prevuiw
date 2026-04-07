@@ -19,33 +19,37 @@ export function HowItWorks() {
           {/* Step 1 */}
           <div className="border border-border/40 rounded-xl overflow-hidden">
             <div className="h-36 bg-neutral-900/50 p-5 flex items-center justify-center">
-              {/* Simple input + button outline */}
-              <div className="flex items-center gap-1.5 w-full">
-                <div className="flex-1 h-7 rounded border border-white/[0.08] px-2 flex items-center">
-                  <span className="text-[8px] text-white/25 font-mono">https://my-app.vercel.app</span>
+              <div className="w-full">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-red-500/60" />
+                  <div className="h-2 w-2 rounded-full bg-yellow-500/60" />
+                  <div className="h-2 w-2 rounded-full bg-green-500/60" />
                 </div>
-                <div className="h-7 px-3 rounded bg-white/10 flex items-center">
-                  <span className="text-[8px] text-white/50">Preview</span>
+                <div className="font-mono text-[8px] text-white/30 leading-relaxed">
+                  <span className="text-blue-400/60">{"<script"}</span>
+                  <span className="text-white/20">{" src="}</span>
+                  <span className="text-green-400/50">{'"sdk.js"'}</span>
+                  <br />
+                  <span className="text-white/20">{"  data-key="}</span>
+                  <span className="text-green-400/50">{'"pk_..."'}</span>
+                  <span className="text-blue-400/60">{">"}</span>
                 </div>
               </div>
             </div>
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">01</p>
               <h3 className="text-base font-semibold mb-1.5">{t("landing.step1Title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t("landing.step1Desc")}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("landing.step1Desc")}</p>
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="border border-border/40 rounded-xl overflow-hidden">
             <div className="h-36 bg-neutral-900/50 p-5 flex items-center justify-center">
-              {/* Simple link + copy outline */}
               <div className="w-full space-y-2">
                 <div className="flex items-center gap-1.5">
                   <div className="flex-1 h-7 rounded border border-white/[0.08] px-2 flex items-center">
-                    <span className="text-[8px] text-white/40 font-mono">prevuiw.com/p/my-app</span>
+                    <span className="text-[8px] text-white/40 font-mono">your-app.com?prevuiw=...</span>
                   </div>
                   <div className="h-7 w-7 rounded border border-white/[0.08] flex items-center justify-center">
                     <svg className="h-3 w-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -59,34 +63,26 @@ export function HowItWorks() {
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">02</p>
               <h3 className="text-base font-semibold mb-1.5">{t("landing.step2Title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t("landing.step2Desc")}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("landing.step2Desc")}</p>
             </div>
           </div>
 
           {/* Step 3 */}
           <div className="border border-border/40 rounded-xl overflow-hidden">
             <div className="h-36 bg-neutral-900/50 p-5 relative">
-              {/* Simple wireframe with one pin */}
               <div className="space-y-1.5 opacity-40">
                 <div className="h-2 w-14 bg-white/10 rounded" />
                 <div className="h-1.5 w-full bg-white/5 rounded" />
                 <div className="h-1.5 w-2/3 bg-white/5 rounded" />
               </div>
-              {/* Single clean pin */}
               <div className="absolute top-8 right-12">
-                <div className="h-5 w-5 rounded-full bg-blue-500/70 flex items-center justify-center text-[9px] font-bold text-white/90">
-                  1
-                </div>
+                <div className="h-5 w-5 rounded-full bg-blue-500/70 flex items-center justify-center text-[9px] font-bold text-white/90">1</div>
               </div>
             </div>
             <div className="p-5">
               <p className="text-xs text-blue-500/70 font-mono mb-2">03</p>
               <h3 className="text-base font-semibold mb-1.5">{t("landing.step3Title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t("landing.step3Desc")}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t("landing.step3Desc")}</p>
             </div>
           </div>
         </div>

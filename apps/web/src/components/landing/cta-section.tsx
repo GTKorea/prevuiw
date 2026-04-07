@@ -1,10 +1,11 @@
 "use client";
 
-import { UrlInput } from "@/components/landing/url-input";
 import { useI18n } from "@/i18n/context";
+import { getGoogleAuthUrl } from "@/shared/lib";
 
 export function CtaSection() {
   const { t } = useI18n();
+  const googleAuthUrl = getGoogleAuthUrl();
 
   return (
     <section className="py-32">
@@ -15,9 +16,12 @@ export function CtaSection() {
         <p className="text-muted-foreground text-sm max-w-md">
           {t("landing.ctaSubtitle")}
         </p>
-        <div className="w-full max-w-xl">
-          <UrlInput />
-        </div>
+        <a
+          href={googleAuthUrl}
+          className="inline-flex items-center gap-2 bg-foreground text-background px-8 py-3.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          {t("landing.getStarted")}
+        </a>
         <p className="text-xs text-muted-foreground/50">
           {t("landing.ctaHint")}
         </p>

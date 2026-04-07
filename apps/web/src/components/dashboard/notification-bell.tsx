@@ -4,19 +4,21 @@ import { useRouter } from "next/navigation";
 import { Button, Popover, PopoverContent, PopoverTrigger, ScrollArea } from "@/shared/ui";
 import { useNotifications, useUnreadCount, useMarkAllRead } from "@/entities/notification";
 import { cn, formatRelativeTime } from "@/shared/lib";
-
-function typeLabel(type: "MENTION" | "REPLY" | "RESOLVE") {
-  if (type === "MENTION") return "mentioned you";
-  if (type === "REPLY") return "replied";
-  if (type === "RESOLVE") return "resolved a comment";
-  return "";
-}
+import { useI18n } from "@/i18n/context";
 
 export function NotificationBell() {
   const router = useRouter();
   const { data: notifications, isLoading } = useNotifications();
   const { data: unreadCount } = useUnreadCount();
   const markAllRead = useMarkAllRead();
+  const { t } = useI18n();
+
+  function typeLabel(type: "MENTION" | "REPLY" | "RESOLVE") {
+    if (type === "MENTION") return t("notifications.mentioned");
+    if (type === "REPLY") return t("notifications.replied");
+    if (type === "RESOLVE") return t("notifications.resolved");
+    return "";
+  }
 
   const count = unreadCount ?? 0;
 
@@ -39,7 +41,7 @@ export function NotificationBell() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <span className="text-sm font-semibold">Notifications</span>
+          <span className="text-sm font-semibold">{t("notifications.title")}</span>
           {count > 0 && (
             <Button
               variant="ghost"
@@ -48,19 +50,19 @@ export function NotificationBell() {
               onClick={() => markAllRead.mutate()}
               disabled={markAllRead.isPending}
             >
-              Mark all as read
+              {t("notifications.markAllRead")}
             </Button>
           )}
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-            Loading…
+            {t("notifications.loading")}
           </div>
         ) : !notifications || notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
             <Bell className="h-6 w-6 opacity-40" />
-            <span>No notifications yet</span>
+            <span>{t("notifications.empty")}</span>
           </div>
         ) : (
           <ScrollArea className="max-h-[360px]">

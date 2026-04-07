@@ -3,14 +3,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/shared/lib";
 import { FolderOpen, Settings } from "lucide-react";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Projects", icon: FolderOpen },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-];
+import { useI18n } from "@/i18n/context";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { t } = useI18n();
+
+  const NAV_ITEMS = [
+    { href: "/dashboard", label: t("sidebar.projects"), icon: FolderOpen },
+    { href: "/dashboard/settings", label: t("sidebar.settings"), icon: Settings },
+  ];
 
   return (
     <aside className="w-[220px] shrink-0 border-r border-border bg-background flex flex-col">

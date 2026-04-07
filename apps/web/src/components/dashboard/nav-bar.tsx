@@ -4,8 +4,19 @@ import { useTheme } from "@/components/providers";
 import { useAuth } from "@/entities/auth";
 import { Avatar, AvatarFallback, AvatarImage, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon, Monitor, Globe } from "lucide-react";
 import { useI18n } from "@/i18n/context";
+import type { Locale } from "@/i18n/config";
+import { locales } from "@/i18n/config";
+
+const LOCALE_LABELS: Record<Locale, string> = {
+  en: "English",
+  ko: "한국어",
+  ja: "日本語",
+  zh: "中文",
+  es: "Español",
+  fr: "Français",
+};
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -30,6 +41,32 @@ function ThemeToggle() {
   );
 }
 
+function LanguageSelector() {
+  const { locale, setLocale } = useI18n();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex h-8 items-center gap-1.5 px-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors text-xs font-medium">
+          <Globe className="h-4 w-4" />
+          <span className="hidden sm:inline">{LOCALE_LABELS[locale]}</span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {locales.map((loc) => (
+          <DropdownMenuItem
+            key={loc}
+            onClick={() => setLocale(loc)}
+            className={locale === loc ? "font-medium" : "text-muted-foreground"}
+          >
+            {LOCALE_LABELS[loc]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function NavBar() {
   const { user, logout } = useAuth();
   const { t } = useI18n();
@@ -41,6 +78,7 @@ export function NavBar() {
           prevuiw
         </Link>
         <div className="flex items-center gap-2">
+          <LanguageSelector />
           <ThemeToggle />
           {user && <NotificationBell />}
           {user && (

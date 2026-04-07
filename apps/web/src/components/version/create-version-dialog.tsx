@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Button
 import { useCreateVersion } from "@/entities/project";
 import { Copy, Check } from "lucide-react";
 import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
+import { useI18n } from "@/i18n/context";
 
 export function CreateVersionDialog({ projectId }: { projectId: string }) {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,7 @@ export function CreateVersionDialog({ projectId }: { projectId: string }) {
   } | null>(null);
   const createVersion = useCreateVersion(projectId);
   const { copied, copy } = useCopyToClipboard();
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,12 +49,12 @@ export function CreateVersionDialog({ projectId }: { projectId: string }) {
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
-        <Button>+ New Version</Button>
+        <Button>{t("version.newVersion")}</Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {createdVersion ? "Version Created" : "Add New Version"}
+            {createdVersion ? t("version.createdTitle") : t("version.addTitle")}
           </DialogTitle>
         </DialogHeader>
 
@@ -60,7 +62,7 @@ export function CreateVersionDialog({ projectId }: { projectId: string }) {
           <div className="flex flex-col gap-4">
             <div>
               <p className="text-sm text-muted-foreground mb-2">
-                Share this URL with your team to start reviewing:
+                {t("version.shareUrl")}
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 p-3 bg-muted rounded-lg">
@@ -76,30 +78,30 @@ export function CreateVersionDialog({ projectId }: { projectId: string }) {
                 </Button>
               </div>
             </div>
-            <Button onClick={handleClose}>Done</Button>
+            <Button onClick={handleClose}>{t("version.done")}</Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <Input
-              placeholder="Version name (e.g. v2.0)"
+              placeholder={t("version.versionName")}
               value={versionName}
               onChange={(e) => setVersionName(e.target.value)}
               required
             />
             <Input
-              placeholder="https://your-app.com"
+              placeholder={t("version.domainPlaceholder")}
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               required
             />
             <Textarea
-              placeholder="Version memo (optional)"
+              placeholder={t("version.memo")}
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               rows={2}
             />
             <Button type="submit" disabled={createVersion.isPending}>
-              {createVersion.isPending ? "Creating..." : "Create Version"}
+              {createVersion.isPending ? t("version.creating") : t("version.create")}
             </Button>
           </form>
         )}

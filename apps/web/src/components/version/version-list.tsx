@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Badge, Button } from "@/shared/ui";
+import { useI18n } from "@/i18n/context";
 
 interface Version {
   id: string;
@@ -20,6 +21,7 @@ interface VersionListProps {
 }
 
 export function VersionList({ versions, projectSlug }: VersionListProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2">
       {versions.map((version) => (
@@ -30,7 +32,7 @@ export function VersionList({ versions, projectSlug }: VersionListProps) {
           }`}
         >
           {version.isActive ? (
-            <Badge className="bg-blue-500/20 text-blue-400 border-0">LIVE</Badge>
+            <Badge className="bg-blue-500/20 text-blue-400 border-0">{t("version.live")}</Badge>
           ) : (
             <Badge variant="secondary" className="text-xs">{version.versionName}</Badge>
           )}
@@ -44,11 +46,11 @@ export function VersionList({ versions, projectSlug }: VersionListProps) {
             </div>
           </div>
 
-          <span className="text-xs text-muted-foreground">{version._count.comments} comments</span>
+          <span className="text-xs text-muted-foreground">{version._count.comments} {t("project.comments")}</span>
 
           <Link href={`/p/${projectSlug}/${version.id}`}>
             <Button variant="secondary" size="sm">
-              {version.isActive ? "Open" : "View"}
+              {version.isActive ? t("version.open") : t("version.view")}
             </Button>
           </Link>
         </div>

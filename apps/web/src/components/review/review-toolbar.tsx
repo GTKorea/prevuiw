@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui";
 import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
+import { useI18n } from "@/i18n/context";
 
 interface ReviewToolbarProps {
   projectName: string;
@@ -37,6 +38,7 @@ export function ReviewToolbar({
   reviewUrl,
 }: ReviewToolbarProps) {
   const { copied, copy } = useCopyToClipboard();
+  const { t } = useI18n();
 
   return (
     <TooltipProvider>
@@ -77,7 +79,7 @@ export function ReviewToolbar({
               {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{copied ? "Copied!" : "Copy review URL"}</TooltipContent>
+          <TooltipContent>{copied ? t("review.copied") : t("review.copyReviewUrl")}</TooltipContent>
         </Tooltip>
 
         {/* Sidebar toggle */}
@@ -93,7 +95,7 @@ export function ReviewToolbar({
               <span className="text-xs">{commentCount}</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Toggle comments</TooltipContent>
+          <TooltipContent>{t("review.toggleComments")}</TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>

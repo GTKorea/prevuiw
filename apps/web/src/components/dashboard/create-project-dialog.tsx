@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Button
 import { useCreateProject } from "@/entities/project";
 import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
 import { Check, Copy } from "lucide-react";
+import { useI18n } from "@/i18n/context";
 
 export function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,7 @@ export function CreateProjectDialog() {
   const { copied, copy } = useCopyToClipboard();
   const router = useRouter();
   const createProject = useCreateProject();
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,35 +52,35 @@ export function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>+ New Project</Button>
+        <Button>{t("dashboard.newProject")}</Button>
       </DialogTrigger>
       <DialogContent>
         {step === "form" ? (
           <>
             <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
+              <DialogTitle>{t("project.createTitle")}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
-                placeholder="Project name"
+                placeholder={t("project.projectName")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoFocus
               />
               <Button type="submit" disabled={createProject.isPending}>
-                {createProject.isPending ? "Creating..." : "Create"}
+                {createProject.isPending ? t("project.creating") : t("project.create")}
               </Button>
             </form>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Project Created!</DialogTitle>
+              <DialogTitle>{t("project.createdTitle")}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <div className="rounded-md border border-border bg-muted/50 p-3 text-xs space-y-2">
                 <p className="font-medium text-foreground">
-                  1. Add this SDK script to your site's {"<head>"}
+                  {t("project.sdkStep1Title")}
                 </p>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 rounded bg-background px-2 py-1.5 text-[11px] text-foreground border border-border select-all break-all">
@@ -92,18 +94,18 @@ export function CreateProjectDialog() {
                     onClick={() => copy(sdkSnippet)}
                   >
                     {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? t("project.copied") : t("project.copy")}
                   </Button>
                 </div>
               </div>
               <div className="rounded-md border border-border bg-muted/50 p-3 text-xs space-y-1">
-                <p className="font-medium text-foreground">2. Deploy your site</p>
+                <p className="font-medium text-foreground">{t("project.sdkStep2Title")}</p>
                 <p className="text-muted-foreground">
-                  Once deployed, create a version with your domain to start reviewing.
+                  {t("project.sdkStep2Desc")}
                 </p>
               </div>
               <Button onClick={handleGoToProject}>
-                Go to Project
+                {t("project.goToProject")}
               </Button>
             </div>
           </>

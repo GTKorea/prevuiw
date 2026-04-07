@@ -6,6 +6,7 @@ import { CommentThread } from "./comment-thread";
 import { ScrollArea, Button } from "@/shared/ui";
 import { cn } from "@/shared/lib";
 import { X } from "lucide-react";
+import { useI18n } from "@/i18n/context";
 
 type FilterTab = "all" | "open" | "resolved";
 
@@ -23,6 +24,7 @@ export function CommentSidebar({
   onClose,
 }: CommentSidebarProps) {
   const [filter, setFilter] = useState<FilterTab>("all");
+  const { t } = useI18n();
 
   const topLevelComments = comments.filter((c) => !c.parentId);
 
@@ -42,7 +44,7 @@ export function CommentSidebar({
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-border">
         <h2 className="text-sm font-semibold">
-          Comments ({topLevelComments.length})
+          {t("review.comments")} ({topLevelComments.length})
         </h2>
         <Button variant="ghost" size="icon-xs" onClick={onClose}>
           <X className="size-4" />
@@ -53,9 +55,9 @@ export function CommentSidebar({
       <div className="flex border-b border-border">
         {(
           [
-            { key: "all", label: "All", count: topLevelComments.length },
-            { key: "open", label: "Open", count: openCount },
-            { key: "resolved", label: "Resolved", count: resolvedCount },
+            { key: "all", label: t("review.allComments"), count: topLevelComments.length },
+            { key: "open", label: t("review.openComments"), count: openCount },
+            { key: "resolved", label: t("review.resolvedComments"), count: resolvedCount },
           ] as const
         ).map(({ key, label, count }) => (
           <button
@@ -77,7 +79,7 @@ export function CommentSidebar({
       <ScrollArea className="flex-1 overflow-hidden">
         {filteredComments.length === 0 ? (
           <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-            No comments yet
+            {t("review.noComments")}
           </div>
         ) : (
           filteredComments.map((comment) => (

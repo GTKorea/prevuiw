@@ -10,6 +10,7 @@ import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
 import { Button } from "@/shared/ui";
 import { NavBar } from "@/components/dashboard/nav-bar";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { useI18n } from "@/i18n/context";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3012";
 
@@ -19,6 +20,7 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
   const generateKey = useGenerateKey(projectId);
   const { copied: keyCopied, copy: copyKey } = useCopyToClipboard();
   const { copied: snippetCopied, copy: copySnippet } = useCopyToClipboard();
+  const { t } = useI18n();
 
   const scriptSnippet = publishableKey
     ? `<script src="${API_URL}/sdk.js" data-key="${publishableKey}" data-api="${API_URL}"></script>`
@@ -38,7 +40,7 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors"
       >
-        <span className="font-medium text-sm">SDK Setup</span>
+        <span className="font-medium text-sm">{t("project.sdkSetup")}</span>
         <span className="text-muted-foreground text-sm">{open ? "▲" : "▼"}</span>
       </button>
 
@@ -47,7 +49,7 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
           {/* Publishable Key */}
           <div>
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Publishable Key
+              {t("project.publishableKey")}
             </label>
             {publishableKey ? (
               <div className="mt-1 flex items-center gap-2">
@@ -59,18 +61,18 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
                   size="sm"
                   onClick={() => setRevealed(!revealed)}
                 >
-                  {revealed ? "Hide" : "Reveal"}
+                  {revealed ? t("project.hide") : t("project.reveal")}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => copyKey(publishableKey)}
                 >
-                  {keyCopied ? "Copied!" : "Copy"}
+                  {keyCopied ? t("project.copied") : t("project.copy")}
                 </Button>
               </div>
             ) : (
-              <p className="mt-1 text-sm text-muted-foreground">No key generated yet.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t("project.noKeyYet")}</p>
             )}
             <div className="mt-2">
               <Button
@@ -79,10 +81,10 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
                 disabled={generateKey.isPending}
               >
                 {generateKey.isPending
-                  ? "Generating..."
+                  ? t("project.generating")
                   : publishableKey
-                    ? "Regenerate Key"
-                    : "Generate Key"}
+                    ? t("project.regenerateKey")
+                    : t("project.generateKey")}
               </Button>
             </div>
           </div>
@@ -91,10 +93,10 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
           {scriptSnippet && (
             <div>
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Script Tag
+                {t("project.scriptTag")}
               </label>
               <p className="text-xs text-muted-foreground mt-1 mb-2">
-                {"Add this to your site's <head> to enable scroll and URL tracking in prevuiw."}
+                {t("project.scriptTagDesc")}
               </p>
               <div className="relative">
                 <pre className="bg-muted px-3 py-2 rounded text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">
@@ -106,7 +108,7 @@ function SdkSetupSection({ projectId, publishableKey }: { projectId: string; pub
                   className="absolute top-1 right-1"
                   onClick={() => copySnippet(scriptSnippet)}
                 >
-                  {snippetCopied ? "Copied!" : "Copy"}
+                  {snippetCopied ? t("project.copied") : t("project.copy")}
                 </Button>
               </div>
             </div>
@@ -122,13 +124,14 @@ export default function VersionHistoryPage() {
   const slug = params.slug as string;
   const { data: project, isLoading } = useProject(slug);
   const { user } = useAuth();
+  const { t } = useI18n();
 
   if (isLoading) return (
     <div className="h-screen flex flex-col bg-background">
       <NavBar />
       <div className="flex flex-1 min-h-0">
         <DashboardSidebar />
-        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>
+        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">{t("common.loading")}</p></div>
       </div>
     </div>
   );
@@ -138,7 +141,7 @@ export default function VersionHistoryPage() {
       <NavBar />
       <div className="flex flex-1 min-h-0">
         <DashboardSidebar />
-        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">Project not found</p></div>
+        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">{t("project.notFound")}</p></div>
       </div>
     </div>
   );
@@ -164,7 +167,7 @@ export default function VersionHistoryPage() {
         </div>
 
         {project.versions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-12">No versions yet. Add your first version to get started!</p>
+          <p className="text-muted-foreground text-center py-12">{t("version.noVersions")}</p>
         ) : (
           <VersionList versions={project.versions} projectSlug={slug} />
         )}
