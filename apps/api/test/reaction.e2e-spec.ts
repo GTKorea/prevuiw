@@ -28,8 +28,9 @@ describe('Reaction (e2e)', () => {
       data: {
         projectId: project.id,
         versionName: 'v1.0',
-        url: 'https://example.com',
-        urlType: 'MUTABLE',
+        domain: 'https://example.com',
+        versionKey: `vk-reaction-${Date.now()}`,
+        inviteToken: `it-reaction-${Date.now()}`,
         isActive: true,
       },
     });
@@ -41,6 +42,7 @@ describe('Reaction (e2e)', () => {
         content: 'Comment for reactions',
         posX: 10,
         posY: 20,
+        viewport: 'DESKTOP_1920',
       },
     });
     commentId = comment.id;

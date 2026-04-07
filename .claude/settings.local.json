@@ -54,7 +54,14 @@
       "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_b7d243a0468460ea__ $B console)",
       "Bash(B=~/.claude/skills/gstack/browse/dist/browse __NEW_LINE_9885100eae2b5e73__ $B goto \"http://localhost:8080/test-sdk.html?prevuiw\")",
       "Bash(B=~/.claude/skills/gstack/browse/dist/browse sleep 5 $B console)",
-      "Bash(B=~/.claude/skills/gstack/browse/dist/browse $B console)"
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse $B console)",
+      "Bash(grep -n \"reaction\\\\|emoji\\\\|toggle\" apps/api/src/reaction/*.ts)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:fonts.googleapis.com)",
+      "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw -name *.prisma)",
+      "Bash(grep:*)",
+      "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw/apps/api/uploads -type f -name *.png)",
+      "WebSearch"
     ]
   },
   "sandbox": {

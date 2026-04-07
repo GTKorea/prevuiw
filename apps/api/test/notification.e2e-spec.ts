@@ -22,7 +22,7 @@ describe('Notification (e2e)', () => {
     otherUserId = other.id;
     otherToken = ot;
 
-    // Create project → version → comment chain for notification FK
+    // Create project -> version -> comment chain for notification FK
     const project = await ctx.prisma.project.create({
       data: {
         name: 'Notif Test Project',
@@ -35,8 +35,9 @@ describe('Notification (e2e)', () => {
       data: {
         projectId: project.id,
         versionName: 'v1.0',
-        url: 'https://example.com',
-        urlType: 'MUTABLE',
+        domain: 'https://example.com',
+        versionKey: `vk-notif-${Date.now()}`,
+        inviteToken: `it-notif-${Date.now()}`,
         isActive: true,
       },
     });
@@ -48,6 +49,7 @@ describe('Notification (e2e)', () => {
         content: 'Triggering comment',
         posX: 10,
         posY: 20,
+        viewport: 'DESKTOP_1920',
       },
     });
 

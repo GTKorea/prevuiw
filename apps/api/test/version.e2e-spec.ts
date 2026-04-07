@@ -35,42 +35,24 @@ describe('Version (e2e)', () => {
   afterAll(() => closeTestApp(ctx));
 
   describe('POST /projects/:projectId/versions', () => {
-    it('should create a version with IMMUTABLE urlType for Vercel-like URL', async () => {
+    it('should create a version with domain', async () => {
       const response = await request(ctx.app.getHttpServer())
         .post(`/projects/${projectId}/versions`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           versionName: 'v1.0',
-          url: 'https://my-app-abc123.vercel.app',
+          domain: 'https://example.com',
         })
         .expect(201);
 
       expect(response.body).toMatchObject({
         projectId,
         versionName: 'v1.0',
-        url: 'https://my-app-abc123.vercel.app',
-        urlType: 'IMMUTABLE',
+        domain: 'https://example.com',
         isActive: true,
       });
-    });
-
-    it('should create a version with MUTABLE urlType for a regular URL', async () => {
-      const response = await request(ctx.app.getHttpServer())
-        .post(`/projects/${projectId}/versions`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          versionName: 'v1.0',
-          url: 'https://example.com',
-        })
-        .expect(201);
-
-      expect(response.body).toMatchObject({
-        projectId,
-        versionName: 'v1.0',
-        url: 'https://example.com',
-        urlType: 'MUTABLE',
-        isActive: true,
-      });
+      expect(response.body.versionKey).toBeDefined();
+      expect(response.body.inviteToken).toBeDefined();
     });
 
     it('should deactivate the previous active version when creating a new one', async () => {
@@ -79,7 +61,7 @@ describe('Version (e2e)', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           versionName: 'v1.0',
-          url: 'https://example.com/v1',
+          domain: 'https://example.com',
         })
         .expect(201);
 
@@ -91,7 +73,7 @@ describe('Version (e2e)', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           versionName: 'v2.0',
-          url: 'https://example.com/v2',
+          domain: 'https://example.com',
         })
         .expect(201);
 
@@ -108,7 +90,7 @@ describe('Version (e2e)', () => {
         .post(`/projects/${projectId}/versions`)
         .send({
           versionName: 'v1.0',
-          url: 'https://example.com',
+          domain: 'https://example.com',
         })
         .expect(401);
     });
@@ -119,7 +101,7 @@ describe('Version (e2e)', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           versionName: 'v1.0',
-          url: 'https://example.com',
+          domain: 'https://example.com',
         })
         .expect(404);
     });
@@ -130,7 +112,7 @@ describe('Version (e2e)', () => {
       await request(ctx.app.getHttpServer())
         .post(`/projects/${projectId}/versions`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ versionName: 'v1.0', url: 'https://example.com/v1' })
+        .send({ versionName: 'v1.0', domain: 'https://example.com' })
         .expect(201);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -138,7 +120,7 @@ describe('Version (e2e)', () => {
       await request(ctx.app.getHttpServer())
         .post(`/projects/${projectId}/versions`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ versionName: 'v2.0', url: 'https://example.com/v2' })
+        .send({ versionName: 'v2.0', domain: 'https://example.com' })
         .expect(201);
 
       const response = await request(ctx.app.getHttpServer())
@@ -155,7 +137,7 @@ describe('Version (e2e)', () => {
       await request(ctx.app.getHttpServer())
         .post(`/projects/${projectId}/versions`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ versionName: 'v1.0', url: 'https://example.com' })
+        .send({ versionName: 'v1.0', domain: 'https://example.com' })
         .expect(201);
 
       return request(ctx.app.getHttpServer())
@@ -169,7 +151,7 @@ describe('Version (e2e)', () => {
       const createResponse = await request(ctx.app.getHttpServer())
         .post(`/projects/${projectId}/versions`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ versionName: 'v1.0', url: 'https://example.com' })
+        .send({ versionName: 'v1.0', domain: 'https://example.com' })
         .expect(201);
 
       const versionId = createResponse.body.id;
@@ -181,7 +163,7 @@ describe('Version (e2e)', () => {
       expect(response.body).toMatchObject({
         id: versionId,
         versionName: 'v1.0',
-        url: 'https://example.com',
+        domain: 'https://example.com',
       });
       expect(response.body.project).toBeDefined();
       expect(response.body.screenshots).toBeDefined();

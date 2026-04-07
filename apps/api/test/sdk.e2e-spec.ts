@@ -47,6 +47,8 @@ describe('SDK (e2e)', () => {
   describe('POST /sdk/resolve-version', () => {
     let publishableKey: string;
     let versionId: string;
+    let versionKey: string;
+    let inviteToken: string;
 
     beforeAll(async () => {
       const { user } = await createTestUser(
@@ -64,24 +66,29 @@ describe('SDK (e2e)', () => {
       });
       publishableKey = project.publishableKey!;
 
+      versionKey = `vk-sdk-resolve-${Date.now()}`;
+      inviteToken = `it-sdk-resolve-${Date.now()}`;
+
       const version = await ctx.prisma.version.create({
         data: {
           projectId: project.id,
           versionName: 'v1',
-          url: 'https://example.com',
-          urlType: 'MUTABLE',
+          domain: 'https://example.com',
+          versionKey,
+          inviteToken,
           isActive: true,
         },
       });
       versionId = version.id;
     });
 
-    it('should resolve version by project key and URL', async () => {
+    it('should resolve version by project key, version key, and invite token', async () => {
       const response = await request(ctx.app.getHttpServer())
         .post('/sdk/resolve-version')
         .send({
           projectKey: publishableKey,
-          currentUrl: 'https://example.com/page',
+          versionKey,
+          inviteToken,
         })
         .expect(200);
 
@@ -94,27 +101,40 @@ describe('SDK (e2e)', () => {
         .post('/sdk/resolve-version')
         .send({
           projectKey: 'pk_invalid',
-          currentUrl: 'https://example.com',
+          versionKey,
+          inviteToken,
         })
         .expect(401);
     });
 
-    it('should fall back to latest active version when URL does not match', async () => {
-      const response = await request(ctx.app.getHttpServer())
+    it('should reject invalid invite token', async () => {
+      await request(ctx.app.getHttpServer())
         .post('/sdk/resolve-version')
         .send({
           projectKey: publishableKey,
-          currentUrl: 'https://nomatch.com/page',
+          versionKey,
+          inviteToken: 'invalid-token',
         })
-        .expect(200);
+        .expect(401);
+    });
 
-      expect(response.body.versionId).toBe(versionId);
+    it('should reject invalid version key', async () => {
+      await request(ctx.app.getHttpServer())
+        .post('/sdk/resolve-version')
+        .send({
+          projectKey: publishableKey,
+          versionKey: 'invalid-vk',
+          inviteToken,
+        })
+        .expect(401);
     });
   });
 
   describe('SDK full flow', () => {
     let publishableKey: string;
     let versionId: string;
+    let versionKey: string;
+    let inviteToken: string;
 
     beforeAll(async () => {
       const { user } = await createTestUser(ctx.prisma, ctx.jwtService, 'sdk-flow');
@@ -128,12 +148,16 @@ describe('SDK (e2e)', () => {
       });
       publishableKey = project.publishableKey!;
 
+      versionKey = `vk-sdk-flow-${Date.now()}`;
+      inviteToken = `it-sdk-flow-${Date.now()}`;
+
       const version = await ctx.prisma.version.create({
         data: {
           projectId: project.id,
           versionName: 'v1',
-          url: 'https://staging.example.com',
-          urlType: 'MUTABLE',
+          domain: 'https://staging.example.com',
+          versionKey,
+          inviteToken,
           isActive: true,
         },
       });
@@ -144,7 +168,7 @@ describe('SDK (e2e)', () => {
       // Step 1: Resolve version
       const resolved = await request(ctx.app.getHttpServer())
         .post('/sdk/resolve-version')
-        .send({ projectKey: publishableKey, currentUrl: 'https://staging.example.com/about' })
+        .send({ projectKey: publishableKey, versionKey, inviteToken })
         .expect(200);
 
       expect(resolved.body.versionId).toBe(versionId);
@@ -156,9 +180,10 @@ describe('SDK (e2e)', () => {
           content: 'This button needs more padding',
           posX: 42.5,
           posY: 67.3,
+          viewport: 'DESKTOP_1920',
           cssSelector: 'button.cta-primary',
           pageUrl: 'https://staging.example.com/about',
-          guestName: 'Reviewer 1',
+          reviewerName: 'Reviewer 1',
         })
         .expect(201);
 
