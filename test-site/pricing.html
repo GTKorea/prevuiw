@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Inc. — Pricing</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="logo">Acme Inc.</div>
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/features">Features</a>
+        <a href="/pricing" class="active">Pricing</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
+
+    <section class="section" style="padding-top: 60px">
+      <div class="container">
+        <h2>Simple, transparent pricing</h2>
+        <p
+          style="
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 48px;
+            margin-top: -24px;
+          "
+        >
+          No hidden fees. Cancel anytime.
+        </p>
+
+        <div class="pricing-cards">
+          <div class="price-card">
+            <h3>Starter</h3>
+            <p class="desc">Perfect for side projects</p>
+            <div class="price">$0<span>/mo</span></div>
+            <ul>
+              <li>3 projects</li>
+              <li>1 GB storage</li>
+              <li>100 GB bandwidth</li>
+              <li>Community support</li>
+            </ul>
+            <button class="btn-secondary" style="width: 100%">
+              Get Started
+            </button>
+          </div>
+
+          <div class="price-card popular">
+            <h3>Pro</h3>
+            <p class="desc">For growing teams</p>
+            <div class="price">$29<span>/mo</span></div>
+            <ul>
+              <li>Unlimited projects</li>
+              <li>100 GB storage</li>
+              <li>1 TB bandwidth</li>
+              <li>Priority support</li>
+              <li>Custom domains</li>
+              <li>Analytics</li>
+            </ul>
+            <button class="btn-primary" style="width: 100%">
+              Start Free Trial
+            </button>
+          </div>
+
+          <div class="price-card">
+            <h3>Enterprise</h3>
+            <p class="desc">For large organizations</p>
+            <div class="price">Custom</div>
+            <ul>
+              <li>Everything in Pro</li>
+              <li>SSO / SAML</li>
+              <li>99.99% SLA</li>
+              <li>Dedicated support</li>
+              <li>Invoice billing</li>
+            </ul>
+            <button class="btn-secondary" style="width: 100%">
+              Contact Sales
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container" style="max-width: 700px">
+        <h2>FAQ</h2>
+        <div style="display: flex; flex-direction: column; gap: 24px">
+          <div>
+            <h3 style="font-size: 16px; margin-bottom: 6px">
+              Can I switch plans later?
+            </h3>
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6">
+              Yes! You can upgrade or downgrade at any time. Changes take effect
+              immediately and we'll prorate the difference.
+            </p>
+          </div>
+          <div>
+            <h3 style="font-size: 16px; margin-bottom: 6px">
+              What happens when I exceed my limits?
+            </h3>
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6">
+              We'll notify you and give you 7 days to upgrade. Your deployments
+              won't be affected during this period.
+            </p>
+          </div>
+          <div>
+            <h3 style="font-size: 16px; margin-bottom: 6px">
+              Do you offer discounts for nonprofits?
+            </h3>
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6">
+              Yes! Contact us with proof of nonprofit status and we'll apply a
+              50% discount to any plan.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/features">Features</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <p>&copy; 2026 Acme Inc. All rights reserved.</p>
+    </footer>
+
+    <script
+      src="http://localhost:3012/sdk.js"
+      data-key="pk_fe014b545deca76e30c550e068fb42f018f1a8ba9782e484"
+      data-api="http://localhost:3012"
+    ></script>
+  </body>
+</html>

@@ -9,3 +9,4 @@ dist/
 .gstack/
 .env.development
 test-sdk.html
+apps/api/uploads/

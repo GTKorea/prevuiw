@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Inc. — Home</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="logo">Acme Inc.</div>
+      <div class="links">
+        <a href="/" class="active">Home</a>
+        <a href="/features">Features</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1>Ship faster with Acme</h1>
+      <p>
+        The all-in-one platform for modern teams. Build, deploy, and scale
+        without the complexity.
+      </p>
+      <button class="btn-primary" onclick="location.href = 'pricing.html'">
+        Start Free Trial
+      </button>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="stats">
+          <div class="stat-card">
+            <div class="number">10K+</div>
+            <div class="label">Active Teams</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">99.9%</div>
+            <div class="label">Uptime SLA</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">150+</div>
+            <div class="label">Integrations</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <h2>Trusted by industry leaders</h2>
+        <div class="logos">
+          <div class="logo-placeholder">Company A</div>
+          <div class="logo-placeholder">Company B</div>
+          <div class="logo-placeholder">Company C</div>
+          <div class="logo-placeholder">Company D</div>
+          <div class="logo-placeholder">Company E</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Ready to get started?</h2>
+      <p>Join 10,000+ teams already shipping faster with Acme.</p>
+      <button class="btn-primary" onclick="location.href = 'pricing.html'">
+        Get Started Free
+      </button>
+    </section>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/features">Features</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <p>&copy; 2026 Acme Inc. All rights reserved.</p>
+    </footer>
+
+    <!--
+    prevuiw SDK — 멀티 페이지 테스트
+    1. pnpm --filter api dev
+    2. npx serve test-site -p 8080
+    3. http://localhost:8080/index.html?prevuiw=VERSION_KEY&token=INVITE_TOKEN
+  -->
+    <script
+      src="http://localhost:3012/sdk.js"
+      data-key="pk_fe014b545deca76e30c550e068fb42f018f1a8ba9782e484"
+      data-api="http://localhost:3012"
+    ></script>
+  </body>
+</html>

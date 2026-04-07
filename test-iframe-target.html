@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>prevuiw iframe Test Target</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; }
+
+    header {
+      background: #fff;
+      padding: 16px 32px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo { font-weight: 700; font-size: 18px; }
+    header nav { display: flex; gap: 20px; }
+    header a { text-decoration: none; color: #4b5563; font-size: 14px; }
+
+    .banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      color: white;
+      padding: 60px 32px;
+    }
+    .banner h1 { font-size: 36px; margin-bottom: 12px; }
+    .banner p { font-size: 16px; opacity: 0.8; max-width: 500px; }
+
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 32px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    .stat-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-card .number { font-size: 32px; font-weight: 700; color: #3b82f6; }
+    .stat-card .label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card h3 { font-size: 16px; margin-bottom: 8px; }
+    .card p { font-size: 14px; color: #6b7280; line-height: 1.5; }
+    .card .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      background: #eff6ff;
+      color: #3b82f6;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 48px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    th { font-weight: 600; color: #374151; background: #f9fafb; }
+    td { color: #4b5563; }
+    .status-badge {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-closed { background: #fee2e2; color: #991b1b; }
+
+    .form-section {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+    .form-section h2 { font-size: 20px; margin-bottom: 20px; }
+    .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .form-row input, .form-row select {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .form-row button {
+      padding: 10px 20px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    footer {
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      padding: 32px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Dashboard</div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#projects">Projects</a>
+      <a href="#team">Team</a>
+      <a href="#settings">Settings</a>
+    </nav>
+  </header>
+
+  <div class="banner">
+    <h1>Welcome back, Sarah</h1>
+    <p>Your team has 3 active projects and 12 open tasks this week.</p>
+  </div>
+
+  <div class="content">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="number">3</div>
+        <div class="label">Active Projects</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">12</div>
+        <div class="label">Open Tasks</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">89%</div>
+        <div class="label">Completion Rate</div>
+      </div>
+    </div>
+
+    <h2 style="font-size:20px;margin-bottom:16px;">Recent Projects</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Mobile App Redesign</h3>
+        <p>Redesigning the iOS and Android apps with new design system and improved onboarding flow.</p>
+        <span class="tag">Design</span>
+      </div>
+      <div class="card">
+        <h3>API v3 Migration</h3>
+        <p>Migrating all endpoints to v3 with improved pagination, filtering, and rate limiting.</p>
+        <span class="tag">Backend</span>
+      </div>
+      <div class="card">
+        <h3>Analytics Dashboard</h3>
+        <p>Building real-time analytics dashboard with custom charts and export functionality.</p>
+        <span class="tag">Frontend</span>
+      </div>
+      <div class="card">
+        <h3>Payment Integration</h3>
+        <p>Integrating Stripe and PayPal with subscription management and invoice generation.</p>
+        <span class="tag">Full Stack</span>
+      </div>
+    </div>
+
+    <h2 style="font-size:20px;margin-bottom:16px;">Task Overview</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Assignee</th>
+          <th>Priority</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fix login page responsiveness</td>
+          <td>Alex Kim</td>
+          <td>High</td>
+          <td><span class="status-badge status-active">Active</span></td>
+        </tr>
+        <tr>
+          <td>Add dark mode toggle</td>
+          <td>Maria Chen</td>
+          <td>Medium</td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+        </tr>
+        <tr>
+          <td>Optimize image loading</td>
+          <td>James Lee</td>
+          <td>High</td>
+          <td><span class="status-badge status-active">Active</span></td>
+        </tr>
+        <tr>
+          <td>Update privacy policy page</td>
+          <td>Sarah Park</td>
+          <td>Low</td>
+          <td><span class="status-badge status-closed">Closed</span></td>
+        </tr>
+        <tr>
+          <td>Implement search autocomplete</td>
+          <td>Alex Kim</td>
+          <td>High</td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="form-section">
+      <h2>Quick Add Task</h2>
+      <div class="form-row">
+        <input type="text" placeholder="Task name">
+        <select>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
+        <button onclick="alert('Task added!')">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Acme Dashboard. Built with care.</p>
+  </footer>
+
+  <script src="http://localhost:3012/sdk.js"></script>
+</body>
+</html>
