@@ -181,6 +181,19 @@ export class Sidebar {
       num.className = `prevuiw-sidebar-num${comment.isResolved ? " resolved" : ""}`;
       num.textContent = String(topLevel.indexOf(comment) + 1);
 
+      // Avatar
+      const authorName = comment.author?.name || comment.reviewerName || "Anonymous";
+      const avatar = document.createElement("div");
+      avatar.className = "prevuiw-sidebar-avatar";
+      if (comment.author?.avatarUrl) {
+        const img = document.createElement("img");
+        img.src = comment.author.avatarUrl;
+        img.alt = authorName;
+        avatar.appendChild(img);
+      } else {
+        avatar.textContent = authorName.charAt(0).toUpperCase();
+      }
+
       // Content wrapper
       const content = document.createElement("div");
       content.className = "prevuiw-sidebar-content";
@@ -191,7 +204,7 @@ export class Sidebar {
 
       const authorSpan = document.createElement("span");
       authorSpan.className = "prevuiw-sidebar-author";
-      authorSpan.textContent = comment.author?.name || comment.reviewerName || "Anonymous";
+      authorSpan.textContent = authorName;
 
       const timeSpan = document.createElement("span");
       timeSpan.className = "prevuiw-sidebar-time";
@@ -332,6 +345,7 @@ export class Sidebar {
       }
 
       item.appendChild(num);
+      item.appendChild(avatar);
       item.appendChild(content);
       this.listEl.appendChild(item);
     });

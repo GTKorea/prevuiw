@@ -457,12 +457,28 @@ async function captureAndUploadScreenshot(pageUrl: string) {
   if (!apiClient || !versionKey) return;
   try {
     const { default: html2canvas } = await import("html2canvas");
+
+    // Temporarily remove sidebar margin + viewport constraints for clean capture
+    const savedMargin = document.body.style.marginRight;
+    const savedMaxWidth = document.documentElement.style.maxWidth;
+    const savedDocMargin = document.documentElement.style.margin;
+    document.body.style.marginRight = "0";
+    document.documentElement.style.maxWidth = "";
+    document.documentElement.style.margin = "";
+
     const canvas = await html2canvas(document.body, {
       useCORS: true,
       logging: false,
       scale: 1,
+      windowWidth: VIEWPORT_WIDTHS[currentViewport] || document.documentElement.scrollWidth,
       ignoreElements: (el: Element) => el.id === "prevuiw-root",
     });
+
+    // Restore
+    document.body.style.marginRight = savedMargin;
+    document.documentElement.style.maxWidth = savedMaxWidth;
+    document.documentElement.style.margin = savedDocMargin;
+
     canvas.toBlob(async (blob) => {
       if (blob && apiClient && versionKey) {
         const ok = await apiClient.uploadScreenshot(versionKey, currentViewport, pageUrl, blob);

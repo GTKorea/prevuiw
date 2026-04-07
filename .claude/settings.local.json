@@ -61,7 +61,8 @@
       "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw -name *.prisma)",
       "Bash(grep:*)",
       "Bash(find /Users/hjick/Documents/applications/krow-tools/prevuiw/apps/api/uploads -type f -name *.png)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(wc:*)"
     ]
   },
   "sandbox": {

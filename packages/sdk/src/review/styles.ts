@@ -278,8 +278,8 @@ export const SDK_STYLES = `
 
   /* ─── Reactions ─── */
   .prevuiw-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .prevuiw-reaction-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #ccc; cursor: pointer; transition: background 0.1s; }
-  .prevuiw-reaction-badge:hover { background: rgba(255,255,255,0.06); }
+  .prevuiw-reaction-badge { display: inline-flex; align-items: center; gap: 2px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); font-size: 12px; color: #e5e5e5; cursor: pointer; transition: background 0.15s; background: transparent; }
+  .prevuiw-reaction-badge:hover { background: rgba(255,255,255,0.08); }
 
   /* ─── Popover Actions ─── */
   .prevuiw-popover-actions { display: flex; align-items: center; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -433,6 +433,13 @@ export const SDK_STYLES = `
   }
 
   .prevuiw-sidebar-num.resolved { background: #10b981; }
+
+  .prevuiw-sidebar-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: #333; color: #aaa;
+    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden; margin-top: 2px;
+  }
+  .prevuiw-sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
   .prevuiw-sidebar-content { flex: 1; min-width: 0; }
 
