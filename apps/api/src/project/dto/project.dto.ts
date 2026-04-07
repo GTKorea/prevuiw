@@ -1,13 +1,9 @@
-import { IsString, IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsUrl({ require_tld: false })
-  @IsOptional()
-  url?: string;
 }
 
 export class UpdateProjectDto {

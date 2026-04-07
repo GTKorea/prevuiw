@@ -11,7 +11,6 @@ import { CommentModule } from './comment/comment.module';
 import { ReactionModule } from './reaction/reaction.module';
 import { ScreenshotModule } from './screenshot/screenshot.module';
 import { NotificationModule } from './notification/notification.module';
-import { ProxyModule } from './proxy/proxy.module';
 import { SdkModule } from './sdk/sdk.module';
 
 @Module({
@@ -27,7 +26,6 @@ import { SdkModule } from './sdk/sdk.module';
     ReactionModule,
     ScreenshotModule,
     NotificationModule,
-    ProxyModule,
     SdkModule,
   ],
   providers: [

@@ -6,12 +6,15 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { Viewport } from '@prisma/client';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { OptionalAuthGuard } from '@/auth/guards/optional-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthUser } from '@/common/types/auth';
 import { CommentService } from './comment.service';
 import { CommentGateway } from './comment.gateway';
 import { CreateCommentDto } from './dto/comment.dto';
@@ -28,7 +31,7 @@ export class CommentController {
   @Throttle({ default: { ttl: 60000, limit: 10 } })
   async create(
     @Param('versionId') versionId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
     @Body() dto: CreateCommentDto,
   ) {
     const comment = await this.commentService.create(
@@ -42,8 +45,11 @@ export class CommentController {
 
   @Get()
   @SkipThrottle()
-  findAll(@Param('versionId') versionId: string) {
-    return this.commentService.findAllByVersion(versionId);
+  findAll(
+    @Param('versionId') versionId: string,
+    @Query('viewport') viewport?: Viewport,
+  ) {
+    return this.commentService.findAllByVersion(versionId, viewport);
   }
 
   @Patch(':id/resolve')
@@ -62,7 +68,7 @@ export class CommentController {
   async delete(
     @Param('versionId') versionId: string,
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     const comment = await this.commentService.delete(id, user.id);
     this.commentGateway.emitDeleteComment(versionId, id);

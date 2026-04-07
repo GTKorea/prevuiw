@@ -1,45 +1,27 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { UrlType } from '@prisma/client';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { ScreenshotService } from '@/screenshot/screenshot.service';
 import { CreateVersionDto } from './dto/version.dto';
-import { validateExternalUrl } from '@/common/utils/url-validator';
-
-const IMMUTABLE_PATTERNS = [
-  /^https:\/\/[\w-]+-[\w]{6,}\.vercel\.app/,       // Vercel
-  /^https:\/\/[\w]+-{2}[\w-]+\.netlify\.app/,       // Netlify
-  /^https:\/\/[\w]+\.[\w-]+\.pages\.dev/,            // Cloudflare Pages
-  /^https:\/\/pr-\d+\.[\w-]+\.amplifyapp\.com/,     // AWS Amplify
-  /^https:\/\/[\w-]+-pr-\d+\.onrender\.com/,        // Render
-];
 
 @Injectable()
 export class VersionService {
-  private readonly logger = new Logger(VersionService.name);
+  constructor(private prisma: PrismaService) {}
 
-  constructor(
-    private prisma: PrismaService,
-    private screenshotService: ScreenshotService,
-  ) {}
+  private generateVersionKey(): string {
+    return randomBytes(8).toString('base64url');
+  }
 
-  detectUrlType(url: string): UrlType {
-    const isImmutable = IMMUTABLE_PATTERNS.some((pattern) => pattern.test(url));
-    return isImmutable ? UrlType.IMMUTABLE : UrlType.MUTABLE;
+  private generateInviteToken(): string {
+    return randomBytes(16).toString('base64url');
   }
 
   async create(projectId: string, userId: string, dto: CreateVersionDto) {
-    validateExternalUrl(dto.url);
-
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
     });
 
     if (!project) {
       throw new NotFoundException(`Project with id "${projectId}" not found`);
-    }
-
-    if (project.isGuest) {
-      throw new ForbiddenException('Guest projects do not support version management. Sign in to add versions.');
     }
 
     if (project.ownerId !== userId) {
@@ -52,30 +34,21 @@ export class VersionService {
       data: { isActive: false },
     });
 
-    const urlType = this.detectUrlType(dto.url);
-
     const version = await this.prisma.version.create({
       data: {
         projectId,
         versionName: dto.versionName,
-        url: dto.url,
+        domain: dto.domain,
+        versionKey: this.generateVersionKey(),
+        inviteToken: this.generateInviteToken(),
         memo: dto.memo,
-        urlType,
         isActive: true,
       },
       include: {
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
         screenshots: true,
       },
     });
-
-    if (urlType === UrlType.IMMUTABLE) {
-      this.screenshotService
-        .captureAndStore(version.id, dto.url)
-        .catch((err) => this.logger.error(`Screenshot capture failed for version ${version.id}:`, err));
-    }
 
     return version;
   }
@@ -84,9 +57,7 @@ export class VersionService {
     return this.prisma.version.findMany({
       where: { projectId },
       include: {
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
         screenshots: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -99,9 +70,7 @@ export class VersionService {
       include: {
         project: true,
         screenshots: true,
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
       },
     });
 
@@ -110,5 +79,14 @@ export class VersionService {
     }
 
     return version;
+  }
+
+  async findByVersionKey(versionKey: string) {
+    return this.prisma.version.findUnique({
+      where: { versionKey },
+      include: {
+        project: { select: { id: true, name: true, publishableKey: true } },
+      },
+    });
   }
 }

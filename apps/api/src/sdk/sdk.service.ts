@@ -12,40 +12,49 @@ export class SdkService {
     });
   }
 
-  async resolveVersion(projectKey: string, currentUrl: string) {
+  async resolveVersion(projectKey: string, versionKey: string) {
     const project = await this.prisma.project.findUnique({
       where: { publishableKey: projectKey },
-      include: {
-        versions: {
-          where: { isActive: true },
-          orderBy: { createdAt: 'desc' },
-        },
+      select: { id: true, name: true },
+    });
+
+    if (!project) return null;
+
+    const version = await this.prisma.version.findUnique({
+      where: { versionKey },
+      select: {
+        id: true,
+        versionName: true,
+        domain: true,
+        projectId: true,
       },
     });
 
-    if (!project || project.versions.length === 0) return null;
+    if (!version || version.projectId !== project.id) return null;
 
-    let matchedVersion = null;
-    try {
-      const incoming = new URL(currentUrl);
-      const incomingOrigin = incoming.origin;
-      matchedVersion = project.versions.find((v) => {
-        try {
-          const vUrl = new URL(v.url);
-          return vUrl.origin === incomingOrigin;
-        } catch {
-          return false;
-        }
-      });
-    } catch {
-      // Invalid URL, fall through to latest
-    }
-
-    const version = matchedVersion || project.versions[0];
     return {
       versionId: version.id,
       projectId: project.id,
       versionName: version.versionName,
+      domain: version.domain,
     };
+  }
+
+  async validateInviteToken(versionKey: string, inviteToken: string) {
+    const version = await this.prisma.version.findUnique({
+      where: { versionKey },
+      select: { id: true, inviteToken: true, projectId: true },
+    });
+
+    if (!version || version.inviteToken !== inviteToken) return null;
+
+    return { versionId: version.id, projectId: version.projectId };
+  }
+
+  async markSdkConnected(projectKey: string) {
+    await this.prisma.project.update({
+      where: { publishableKey: projectKey },
+      data: { sdkConnected: true },
+    });
   }
 }

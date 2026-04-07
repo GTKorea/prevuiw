@@ -41,6 +41,7 @@ export class SdkReviewGateway
   async handleConnection(client: any) {
     const key = client.handshake.query.projectKey as string;
     const versionId = client.handshake.query.versionId as string;
+    const inviteToken = client.handshake.query.inviteToken as string;
     const reviewerName =
       (client.handshake.query.name as string) || 'Anonymous';
 
@@ -53,6 +54,18 @@ export class SdkReviewGateway
     if (!project) {
       client.disconnect();
       return;
+    }
+
+    // Validate invite token if provided
+    if (inviteToken) {
+      const versionKey = client.handshake.query.versionKey as string;
+      if (versionKey) {
+        const tokenValid = await this.sdkService.validateInviteToken(versionKey, inviteToken);
+        if (!tokenValid) {
+          client.disconnect();
+          return;
+        }
+      }
     }
 
     const room = `sdk:${versionId}`;

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthUser } from '@/common/types/auth';
 import { VersionService } from './version.service';
 import { CreateVersionDto } from './dto/version.dto';
 
@@ -19,7 +20,7 @@ export class VersionController {
   @UseGuards(JwtAuthGuard)
   create(
     @Param('projectId') projectId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
     @Body() dto: CreateVersionDto,
   ) {
     return this.versionService.create(projectId, user.id, dto);

@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Viewport } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateCommentDto } from './dto/comment.dto';
 
@@ -11,11 +12,11 @@ export class CommentService {
       data: {
         versionId,
         authorId: userId ?? null,
-        guestName: userId ? null : (dto.guestName ?? null),
+        reviewerName: userId ? null : (dto.reviewerName ?? null),
         content: dto.content,
         posX: dto.posX,
         posY: dto.posY,
-        selectionArea: dto.selectionArea ?? undefined,
+        viewport: dto.viewport,
         pageUrl: dto.pageUrl ?? null,
         cssSelector: dto.cssSelector ?? null,
         parentId: dto.parentId ?? null,
@@ -28,9 +29,13 @@ export class CommentService {
     });
   }
 
-  async findAllByVersion(versionId: string) {
+  async findAllByVersion(versionId: string, viewport?: Viewport) {
     return this.prisma.comment.findMany({
-      where: { versionId, parentId: null },
+      where: {
+        versionId,
+        parentId: null,
+        ...(viewport ? { viewport } : {}),
+      },
       include: {
         author: {
           select: { id: true, name: true, email: true, avatarUrl: true },
@@ -76,4 +81,5 @@ export class CommentService {
 
     return this.prisma.comment.delete({ where: { id: commentId } });
   }
+
 }

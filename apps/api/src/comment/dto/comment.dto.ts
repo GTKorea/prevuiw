@@ -4,9 +4,9 @@ import {
   IsNumber,
   IsOptional,
   IsUUID,
-  IsObject,
-  ValidateIf,
+  IsEnum,
 } from 'class-validator';
+import { Viewport } from '@prisma/client';
 
 export class CreateCommentDto {
   @IsString()
@@ -19,9 +19,8 @@ export class CreateCommentDto {
   @IsNumber()
   posY: number;
 
-  @IsObject()
-  @IsOptional()
-  selectionArea?: { x: number; y: number; width: number; height: number };
+  @IsEnum(Viewport)
+  viewport: Viewport;
 
   @IsString()
   @IsOptional()
@@ -35,8 +34,7 @@ export class CreateCommentDto {
   @IsOptional()
   parentId?: string;
 
-  @ValidateIf((o) => !o.authorId)
   @IsString()
   @IsOptional()
-  guestName?: string;
+  reviewerName?: string;
 }

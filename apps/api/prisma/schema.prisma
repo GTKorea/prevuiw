@@ -12,11 +12,6 @@ enum AuthProvider {
   GITHUB
 }
 
-enum UrlType {
-  IMMUTABLE
-  MUTABLE
-}
-
 enum Viewport {
   MOBILE_375
   TABLET_768
@@ -49,18 +44,16 @@ model User {
 }
 
 model Project {
-  id        String    @id @default(uuid()) @db.Uuid
-  name      String
-  slug      String    @unique
-  ownerId   String?   @db.Uuid
-  isGuest   Boolean   @default(false)
-  guestId   String?
-  expiresAt       DateTime?
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  slug            String    @unique
+  ownerId         String    @db.Uuid
   publishableKey  String?   @unique
+  sdkConnected    Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  owner    User?     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   versions Version[]
 
   @@map("projects")
@@ -70,9 +63,10 @@ model Version {
   id          String   @id @default(uuid()) @db.Uuid
   projectId   String   @db.Uuid
   versionName String
-  url         String
+  domain      String
+  versionKey  String   @unique
+  inviteToken String   @unique
   memo        String?
-  urlType     UrlType
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
@@ -87,11 +81,11 @@ model Comment {
   id            String   @id @default(uuid()) @db.Uuid
   versionId     String   @db.Uuid
   authorId      String?  @db.Uuid
-  guestName     String?
+  reviewerName  String?
   content       String
   posX          Float
   posY          Float
-  selectionArea Json?
+  viewport      Viewport
   pageUrl       String?
   cssSelector   String?
   parentId      String?  @db.Uuid
@@ -126,11 +120,13 @@ model Screenshot {
   id         String   @id @default(uuid()) @db.Uuid
   versionId  String   @db.Uuid
   viewport   Viewport
+  pageUrl    String
   imageUrl   String
   capturedAt DateTime @default(now())
 
   version Version @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
+  @@unique([versionId, viewport, pageUrl])
   @@map("screenshots")
 }
 
