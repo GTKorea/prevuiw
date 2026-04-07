@@ -1,26 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useCommentStore } from "@/stores/comment-store";
-import { cn } from "@/lib/utils";
+import { Button } from "@/shared/ui";
+import { Badge } from "@/shared/ui";
+import { cn } from "@/shared/lib";
 import {
   ArrowLeft,
-  Eye,
-  EyeOff,
-  MessageCircle,
-  MousePointer2,
   PanelRight,
   Users,
   Link as LinkIcon,
+  Check,
+  Copy,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/ui";
+import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
 
 interface ReviewToolbarProps {
   projectName: string;
@@ -30,11 +23,8 @@ interface ReviewToolbarProps {
   onlineCount: number;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
-  disabled?: boolean;
+  reviewUrl: string;
 }
-
-const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
-const modKey = isMac ? "\u2318" : "Ctrl";
 
 export function ReviewToolbar({
   projectName,
@@ -44,17 +34,12 @@ export function ReviewToolbar({
   onlineCount,
   sidebarOpen,
   onToggleSidebar,
-  disabled,
+  reviewUrl,
 }: ReviewToolbarProps) {
-  const { mode, setMode, pinsVisible, setPinsVisible } = useCommentStore();
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
+  const { copied, copy } = useCopyToClipboard();
 
   return (
     <TooltipProvider>
-      {/* Top header — project name only */}
       <div className="h-12 border-b border-border bg-background flex items-center px-3 gap-2 shrink-0 relative z-20">
         <Link
           href={`/p/${projectSlug}`}
@@ -80,77 +65,22 @@ export function ReviewToolbar({
           </div>
         )}
 
-        {/* Share */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-xs" onClick={handleCopyLink} className="cursor-pointer">
-              <LinkIcon className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Copy link</TooltipContent>
-        </Tooltip>
-      </div>
-
-      {/* Floating bottom toolbar — Figma style */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 rounded-xl border border-border bg-background/95 backdrop-blur-sm shadow-lg px-2 py-1.5">
+        {/* Copy review link */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant={mode === "idle" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setMode("idle")}
-              disabled={disabled}
-              className="cursor-pointer gap-1.5"
-            >
-              <MousePointer2 className="size-4" />
-              <span className="text-xs hidden sm:inline">Browse</span>
-              <kbd className="text-[10px] text-muted-foreground ml-0.5 hidden sm:inline">V</kbd>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Browse mode (V)</TooltipContent>
-        </Tooltip>
-
-        <div className="w-px h-5 bg-border" />
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={mode === "commenting" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => setMode("commenting")}
-              disabled={disabled}
-              className="cursor-pointer gap-1.5"
-            >
-              <MessageCircle className="size-4" />
-              <span className="text-xs hidden sm:inline">Comment</span>
-              <kbd className="text-[10px] text-muted-foreground ml-0.5 hidden sm:inline">{modKey}</kbd>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Click or drag to comment ({modKey})</TooltipContent>
-        </Tooltip>
-
-        <div className="w-px h-5 bg-border" />
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={pinsVisible ? "secondary" : "ghost"}
-              size="icon-sm"
-              onClick={() => setPinsVisible(!pinsVisible)}
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => copy(reviewUrl)}
               className="cursor-pointer"
             >
-              {pinsVisible ? (
-                <Eye className="size-4" />
-              ) : (
-                <EyeOff className="size-4" />
-              )}
+              {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
-            {pinsVisible ? "Hide pins" : "Show pins"}
-          </TooltipContent>
+          <TooltipContent>{copied ? "Copied!" : "Copy review URL"}</TooltipContent>
         </Tooltip>
 
+        {/* Sidebar toggle */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button

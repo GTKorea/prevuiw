@@ -8,7 +8,7 @@ import { Features } from "@/components/landing/features";
 import { Platforms } from "@/components/landing/platforms";
 import { CtaSection } from "@/components/landing/cta-section";
 import { Footer } from "@/components/landing/footer";
-import { getGoogleAuthUrl } from "@/lib/auth";
+import { getGoogleAuthUrl } from "@/shared/lib";
 import { useI18n } from "@/i18n/context";
 
 export default function Home() {

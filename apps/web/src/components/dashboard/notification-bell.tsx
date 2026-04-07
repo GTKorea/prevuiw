@@ -1,26 +1,9 @@
 "use client";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications, useUnreadCount, useMarkAllRead } from "@/hooks/use-notifications";
-import { cn } from "@/lib/utils";
-
-function relativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
+import { Button, Popover, PopoverContent, PopoverTrigger, ScrollArea } from "@/shared/ui";
+import { useNotifications, useUnreadCount, useMarkAllRead } from "@/entities/notification";
+import { cn, formatRelativeTime } from "@/shared/lib";
 
 function typeLabel(type: "MENTION" | "REPLY" | "RESOLVE") {
   if (type === "MENTION") return "mentioned you";
@@ -83,7 +66,7 @@ export function NotificationBell() {
           <ScrollArea className="max-h-[360px]">
             <ul>
               {notifications.map((n) => {
-                const author = n.comment.author?.name ?? n.comment.guestName ?? "Someone";
+                const author = n.comment.author?.name ?? n.comment.reviewerName ?? "Someone";
                 const project = n.comment.version.project;
                 const versionId = n.comment.version.id;
                 const href = `/p/${project.slug}?version=${versionId}`;
@@ -111,7 +94,7 @@ export function NotificationBell() {
                             {n.comment.content}
                           </p>
                           <p className="text-[10px] text-muted-foreground/60">
-                            {relativeTime(n.createdAt)}
+                            {formatRelativeTime(n.createdAt)}
                           </p>
                         </div>
                       </div>

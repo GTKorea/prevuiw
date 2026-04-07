@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useTheme } from "@/components/providers";
-import { useAuth } from "@/hooks/use-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/entities/auth";
+import { Avatar, AvatarFallback, AvatarImage, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { Sun, Moon, Monitor } from "lucide-react";
 import { useI18n } from "@/i18n/context";
@@ -37,12 +36,11 @@ export function NavBar() {
 
   return (
     <header className="border-b border-border/40 bg-background/95 backdrop-blur">
-      <div className="flex h-14 items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-lg font-bold">prevuiw</Link>
-          <span className="text-sm text-muted-foreground">Dashboard</span>
-        </div>
-        <div className="flex items-center gap-3">
+      <div className="flex h-12 items-center px-4 gap-2">
+        <Link href="/dashboard" className="text-sm font-bold mr-auto">
+          prevuiw
+        </Link>
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           {user && <NotificationBell />}
           {user && (

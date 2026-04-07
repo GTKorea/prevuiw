@@ -5,15 +5,17 @@ import { api } from "@/lib/api";
 interface Screenshot {
   id: string;
   viewport: string;
+  pageUrl: string;
   imageUrl: string;
 }
 
 interface Version {
   id: string;
   versionName: string;
-  url: string;
+  domain: string;
+  versionKey: string;
+  inviteToken: string;
   memo: string | null;
-  urlType: "IMMUTABLE" | "MUTABLE";
   isActive: boolean;
   createdAt: string;
   _count: { comments: number };
@@ -25,6 +27,7 @@ interface ProjectDetail {
   name: string;
   slug: string;
   publishableKey: string | null;
+  sdkConnected: boolean;
   owner: { id: string; name: string; avatarUrl: string | null };
   versions: Version[];
 }
@@ -48,7 +51,7 @@ export function useGenerateKey(projectId: string) {
 export function useCreateVersion(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { versionName: string; url: string; memo?: string }) =>
+    mutationFn: (data: { versionName: string; domain: string; memo?: string }) =>
       api.post(`/projects/${projectId}/versions`, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project"] }),
   });

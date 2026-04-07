@@ -2,7 +2,7 @@
 
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { setToken } from "@/lib/auth";
+import { setToken } from "@/shared/lib";
 
 function CallbackHandler() {
   const router = useRouter();

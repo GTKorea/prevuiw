@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Comment } from "@/hooks/use-comments";
+import type { Comment } from "@/shared/types";
 import { CommentThread } from "./comment-thread";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { ScrollArea, Button } from "@/shared/ui";
+import { cn } from "@/shared/lib";
 import { X } from "lucide-react";
 
 type FilterTab = "all" | "open" | "resolved";
@@ -13,8 +12,6 @@ type FilterTab = "all" | "open" | "resolved";
 interface CommentSidebarProps {
   comments: Comment[];
   versionId: string;
-  onReply: (parentId: string, content: string) => void;
-  isReplyLoading?: boolean;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,8 +19,6 @@ interface CommentSidebarProps {
 export function CommentSidebar({
   comments,
   versionId,
-  onReply,
-  isReplyLoading,
   isOpen,
   onClose,
 }: CommentSidebarProps) {
@@ -85,14 +80,12 @@ export function CommentSidebar({
             No comments yet
           </div>
         ) : (
-          filteredComments.map((comment, i) => (
+          filteredComments.map((comment) => (
             <CommentThread
               key={comment.id}
               comment={comment}
               index={topLevelComments.indexOf(comment)}
               versionId={versionId}
-              onReply={onReply}
-              isReplyLoading={isReplyLoading}
             />
           ))
         )}

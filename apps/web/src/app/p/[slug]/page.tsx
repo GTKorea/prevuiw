@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useProject, useGenerateKey } from "@/hooks/use-versions";
+import { useProject, useGenerateKey } from "@/entities/project";
 import { VersionList } from "@/components/version/version-list";
 import { CreateVersionDialog } from "@/components/version/create-version-dialog";
-import { useAuth } from "@/hooks/use-auth";
-import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/entities/auth";
+import { useCopyToClipboard } from "@/shared/lib/use-copy-to-clipboard";
+import { Button } from "@/shared/ui";
+import { NavBar } from "@/components/dashboard/nav-bar";
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3012";
 
@@ -121,19 +123,40 @@ export default function VersionHistoryPage() {
   const { data: project, isLoading } = useProject(slug);
   const { user } = useAuth();
 
-  if (isLoading) return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
-  if (!project) return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Project not found</p></div>;
+  if (isLoading) return (
+    <div className="h-screen flex flex-col bg-background">
+      <NavBar />
+      <div className="flex flex-1 min-h-0">
+        <DashboardSidebar />
+        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>
+      </div>
+    </div>
+  );
+
+  if (!project) return (
+    <div className="h-screen flex flex-col bg-background">
+      <NavBar />
+      <div className="flex flex-1 min-h-0">
+        <DashboardSidebar />
+        <div className="flex-1 flex items-center justify-center"><p className="text-muted-foreground">Project not found</p></div>
+      </div>
+    </div>
+  );
 
   const isOwner = user?.id === project.owner?.id;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">←</Link>
-          <h1 className="text-xl font-semibold">{project.name}</h1>
-          <span className="text-muted-foreground text-sm">— Version History</span>
-        </div>
+    <div className="h-screen flex flex-col bg-background">
+      <NavBar />
+      <div className="flex flex-1 min-h-0">
+        <DashboardSidebar />
+        <main className="flex-1 overflow-auto p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
+              <span className="text-sm">←</span>
+            </Link>
+            <h1 className="text-xl font-semibold">{project.name}</h1>
+          </div>
 
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">{project.versions.length} version{project.versions.length !== 1 ? "s" : ""}</p>
@@ -152,6 +175,7 @@ export default function VersionHistoryPage() {
             publishableKey={project.publishableKey}
           />
         )}
+        </main>
       </div>
     </div>
   );

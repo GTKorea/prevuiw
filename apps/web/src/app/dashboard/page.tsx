@@ -1,5 +1,5 @@
 "use client";
-import { useProjects } from "@/hooks/use-projects";
+import { useProjects } from "@/entities/project";
 import { ProjectCard } from "@/components/dashboard/project-card";
 import { CreateProjectDialog } from "@/components/dashboard/create-project-dialog";
 
@@ -25,6 +25,7 @@ export default function DashboardPage() {
               name={project.name}
               slug={project.slug}
               versionCount={project._count.versions}
+              sdkConnected={project.sdkConnected}
               latestVersion={project.versions[0]}
             />
           ))}

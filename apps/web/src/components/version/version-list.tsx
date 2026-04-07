@@ -1,14 +1,13 @@
 "use client";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge, Button } from "@/shared/ui";
 
 interface Version {
   id: string;
   versionName: string;
-  url: string;
+  domain: string;
+  versionKey: string;
   memo: string | null;
-  urlType: "IMMUTABLE" | "MUTABLE";
   isActive: boolean;
   createdAt: string;
   _count: { comments: number };
@@ -41,12 +40,11 @@ export function VersionList({ versions, projectSlug }: VersionListProps) {
               {version.versionName}{version.memo ? ` — ${version.memo}` : ""}
             </div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              {new Date(version.createdAt).toLocaleDateString()} · {version.url.replace(/^https?:\/\//, "")} · {version.urlType.toLowerCase()}
-              {version.urlType === "MUTABLE" && !version.isActive && version.screenshots.length === 0 && " · 📸 screenshots only"}
+              {new Date(version.createdAt).toLocaleDateString()} · {version.domain.replace(/^https?:\/\//, "")}
             </div>
           </div>
 
-          <span className="text-xs text-muted-foreground">💬 {version._count.comments}</span>
+          <span className="text-xs text-muted-foreground">{version._count.comments} comments</span>
 
           <Link href={`/p/${projectSlug}/${version.id}`}>
             <Button variant="secondary" size="sm">

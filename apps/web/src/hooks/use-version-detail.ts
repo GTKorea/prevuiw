@@ -1,41 +1,19 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { api } from "@/shared/api";
+import type { Version } from "@/shared/types";
 
-interface Screenshot {
-  id: string;
-  viewport: string;
-  imageUrl: string;
-}
-
-interface VersionOwner {
-  id: string;
-  name: string;
-  avatarUrl: string | null;
-}
-
-interface VersionProject {
-  id: string;
-  name: string;
-  slug: string;
-  owner: VersionOwner;
-}
-
-export interface VersionDetail {
-  id: string;
-  versionName: string;
-  url: string;
-  memo: string | null;
-  urlType: "IMMUTABLE" | "MUTABLE";
-  isActive: boolean;
-  createdAt: string;
-  _count: { comments: number };
-  screenshots: Screenshot[];
-  project: VersionProject;
+interface VersionWithProject extends Version {
+  project: {
+    id: string;
+    name: string;
+    slug: string;
+    owner: { id: string; name: string; avatarUrl: string | null };
+  };
 }
 
 export function useVersionDetail(projectId: string, versionId: string) {
-  return useQuery<VersionDetail>({
+  return useQuery<VersionWithProject>({
     queryKey: ["version", projectId, versionId],
     queryFn: () => api.get(`/projects/${projectId}/versions/${versionId}`),
     enabled: !!projectId && !!versionId,

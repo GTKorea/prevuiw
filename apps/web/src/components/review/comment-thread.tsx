@@ -1,40 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Comment, useResolveComment, useToggleReaction } from "@/hooks/use-comments";
-import { useCommentStore } from "@/stores/comment-store";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import {
-  CheckCircle2,
-  Circle,
-  MessageSquare,
-  SmilePlus,
-} from "lucide-react";
-import { CommentInput } from "./comment-input";
-
+import type { Comment } from "@/shared/types";
+import { useResolveComment, useToggleReaction, useCommentStore } from "@/entities/comment";
+import { Avatar, AvatarFallback, AvatarImage, Button, Badge } from "@/shared/ui";
+import { cn, formatRelativeTime } from "@/shared/lib";
+import { CheckCircle2, Circle, SmilePlus } from "lucide-react";
 interface CommentThreadProps {
   comment: Comment;
   index: number;
   versionId: string;
-  onReply: (parentId: string, content: string) => void;
-  isReplyLoading?: boolean;
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
 }
 
 const REACTION_EMOJIS = ["\uD83D\uDC4D", "\uD83D\uDC4E", "\u2764\uFE0F", "\uD83D\uDE02", "\uD83D\uDE2E", "\uD83C\uDF89"];
@@ -43,10 +18,7 @@ export function CommentThread({
   comment,
   index,
   versionId,
-  onReply,
-  isReplyLoading,
 }: CommentThreadProps) {
-  const [showReply, setShowReply] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
   const { activeCommentId, setActiveComment } = useCommentStore();
   const resolveComment = useResolveComment(versionId);
@@ -54,7 +26,7 @@ export function CommentThread({
   const isActive = activeCommentId === comment.id;
 
   const authorName =
-    comment.author?.name || comment.guestName || "Anonymous";
+    comment.author?.name || comment.reviewerName || "Anonymous";
   const authorInitial = authorName.charAt(0).toUpperCase();
 
   return (
@@ -86,9 +58,9 @@ export function CommentThread({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium truncate">{authorName}</span>
-            {!comment.author && (
+            {comment.reviewerName && (
               <Badge variant="outline" className="text-[10px] px-1 py-0">
-                Guest
+                Reviewer
               </Badge>
             )}
             <span className="text-xs text-muted-foreground ml-auto shrink-0">
@@ -145,16 +117,6 @@ export function CommentThread({
                 <Circle className="size-3.5" />
               )}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowReply(!showReply);
-              }}
-            >
-              <MessageSquare className="size-3.5" />
-            </Button>
             <div className="relative">
               <Button
                 variant="ghost"
@@ -202,13 +164,13 @@ export function CommentThread({
                     <AvatarImage src={reply.author.avatarUrl} />
                   )}
                   <AvatarFallback>
-                    {(reply.author?.name || reply.guestName || "A")
+                    {(reply.author?.name || reply.reviewerName || "A")
                       .charAt(0)
                       .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <span className="font-medium text-xs">
-                  {reply.author?.name || reply.guestName || "Anonymous"}
+                  {reply.author?.name || reply.reviewerName || "Anonymous"}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {formatRelativeTime(reply.createdAt)}
@@ -222,24 +184,7 @@ export function CommentThread({
         </div>
       )}
 
-      {/* Reply input */}
-      {showReply && (
-        <div
-          className="ml-8 mt-2"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CommentInput
-            onSubmit={(content) => {
-              onReply(comment.id, content);
-              setShowReply(false);
-            }}
-            onCancel={() => setShowReply(false)}
-            placeholder="Reply..."
-            autoFocus
-            isLoading={isReplyLoading}
-          />
-        </div>
-      )}
+      {/* Reply input — replies are made via SDK review mode */}
     </div>
   );
 }
