@@ -195,6 +195,65 @@ export const SDK_STYLES = `
     box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   }
 
+  /* ─── Measure Tool ─── */
+  .prevuiw-measure-source {
+    position: fixed;
+    pointer-events: none;
+    border: 2px solid #3b82f6;
+    border-radius: 2px;
+    background: rgba(59,130,246,0.06);
+    z-index: 2;
+    transition: all 0.05s;
+  }
+
+  .prevuiw-measure-target {
+    position: fixed;
+    pointer-events: none;
+    border: 2px dashed #f43f5e;
+    border-radius: 2px;
+    background: rgba(244,63,94,0.06);
+    z-index: 2;
+    transition: all 0.05s;
+  }
+
+  .prevuiw-measure-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .prevuiw-measure-line {
+    position: fixed;
+    background: #f43f5e;
+    pointer-events: none;
+  }
+
+  .prevuiw-measure-line.h { height: 1px; }
+  .prevuiw-measure-line.v { width: 1px; }
+
+  .prevuiw-measure-label {
+    position: fixed;
+    pointer-events: none;
+    background: #f43f5e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 4;
+  }
+
+  .prevuiw-measure-cap {
+    position: fixed;
+    background: #f43f5e;
+    pointer-events: none;
+  }
+
   /* ─── Element Picker Highlight ─── */
   .prevuiw-highlight {
     position: fixed;

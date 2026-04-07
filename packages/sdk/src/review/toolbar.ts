@@ -1,6 +1,6 @@
 import type { Viewport } from "./types";
 
-export type ToolbarMode = "browse" | "annotate";
+export type ToolbarMode = "browse" | "annotate" | "measure";
 
 const ICONS = {
   pointer: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>`,
@@ -13,6 +13,7 @@ const ICONS = {
   laptop: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>`,
   desktop: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>`,
   user: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  ruler: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`,
 };
 
 const VIEWPORTS: { key: Viewport; icon: string; label: string; width: number }[] = [
@@ -27,6 +28,7 @@ export class Toolbar {
   private topBarEl: HTMLDivElement;
   private browseBtn: HTMLButtonElement;
   private annotateBtn: HTMLButtonElement;
+  private measureBtn: HTMLButtonElement;
   private eyeToggleBtn: HTMLButtonElement;
   private sidebarToggleBtn: HTMLButtonElement;
   private viewportBtns: HTMLButtonElement[] = [];
@@ -98,6 +100,13 @@ export class Toolbar {
 
     const div2 = this.createDivider();
 
+    // Measure button
+    this.measureBtn = document.createElement("button");
+    this.measureBtn.innerHTML = `${ICONS.ruler}<span>Measure</span><kbd>M</kbd>`;
+    this.measureBtn.addEventListener("click", () => this.setMode("measure"));
+
+    const div3 = this.createDivider();
+
     // Eye toggle
     this.eyeToggleBtn = document.createElement("button");
     this.eyeToggleBtn.className = "icon-toggle active";
@@ -121,6 +130,8 @@ export class Toolbar {
     this.toolbarEl.appendChild(div1);
     this.toolbarEl.appendChild(this.annotateBtn);
     this.toolbarEl.appendChild(div2);
+    this.toolbarEl.appendChild(this.measureBtn);
+    this.toolbarEl.appendChild(div3);
     this.toolbarEl.appendChild(this.eyeToggleBtn);
     this.toolbarEl.appendChild(this.sidebarToggleBtn);
 
@@ -152,6 +163,7 @@ export class Toolbar {
     this.mode = mode;
     this.browseBtn.className = mode === "browse" ? "active" : "";
     this.annotateBtn.className = mode === "annotate" ? "active" : "";
+    this.measureBtn.className = mode === "measure" ? "active" : "";
     this.onModeChange(mode);
   }
 

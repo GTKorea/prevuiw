@@ -5,6 +5,7 @@ import { PinManager } from "./pin-manager";
 import { CursorLayer } from "./cursor-layer";
 import { Sidebar } from "./sidebar";
 import { startPicker, stopPicker } from "./element-picker";
+import { MeasureTool } from "./measure-tool";
 import { ApiClient } from "./api-client";
 import { WsClient } from "./ws-client";
 
@@ -12,6 +13,7 @@ let toolbar: Toolbar | null = null;
 let pinManager: PinManager | null = null;
 let cursorLayer: CursorLayer | null = null;
 let sidebar: Sidebar | null = null;
+let measureTool: MeasureTool | null = null;
 let apiClient: ApiClient | null = null;
 let wsClient: WsClient | null = null;
 let comments: CommentData[] = [];
@@ -176,6 +178,7 @@ export async function initReviewMode(config: PrevuiwConfig) {
     reviewerName,
     currentViewport,
   );
+  measureTool = new MeasureTool(shadowRoot, () => toolbar?.setMode("browse"));
   pinManager = new PinManager(shadowRoot);
   cursorLayer = new CursorLayer(shadowRoot);
   sidebar = new Sidebar(shadowRoot);
@@ -340,12 +343,15 @@ async function handleViewportChange(viewport: Viewport) {
 }
 
 function handleModeChange(mode: ToolbarMode) {
+  stopPicker();
+  closeCommentInput();
+  measureTool?.stop();
+
   if (mode === "annotate") {
     const shadowRoot = createShadowHost();
     startPicker(shadowRoot, handleElementPicked);
-  } else {
-    stopPicker();
-    closeCommentInput();
+  } else if (mode === "measure") {
+    measureTool?.start();
   }
 }
 
@@ -362,6 +368,12 @@ function handleKeyDown(e: KeyboardEvent) {
   // C → Comment mode (plain C key, not Cmd+C)
   if ((e.key === "c" || e.key === "C") && !e.metaKey && !e.ctrlKey && !e.altKey) {
     toolbar?.setMode("annotate");
+    return;
+  }
+
+  // M → Measure mode
+  if ((e.key === "m" || e.key === "M") && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    toolbar?.setMode("measure");
     return;
   }
 }
@@ -514,12 +526,14 @@ export function destroyReviewMode() {
   document.body.style.marginRight = "";
   if (scrollRafId) cancelAnimationFrame(scrollRafId);
   toolbar?.destroy();
+  measureTool?.destroy();
   pinManager?.destroy();
   cursorLayer?.destroy();
   sidebar?.destroy();
   wsClient?.disconnect();
   closeCommentInput();
   toolbar = null;
+  measureTool = null;
   pinManager = null;
   cursorLayer = null;
   sidebar = null;
