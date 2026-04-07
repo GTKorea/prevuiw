@@ -4,15 +4,24 @@
   "description": "Prevuiw SDK — embeddable website review overlay with real-time collaboration",
   "main": "dist/index.global.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": true,
-  "keywords": ["website-review", "feedback", "collaboration", "sdk", "annotation"],
+  "keywords": [
+    "website-review",
+    "feedback",
+    "collaboration",
+    "sdk",
+    "annotation"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
   },
   "dependencies": {
     "css-selector-generator": "^3.9.1",
+    "html2canvas": "^1.4.1",
     "socket.io-client": "^4.7.0"
   },
   "devDependencies": {

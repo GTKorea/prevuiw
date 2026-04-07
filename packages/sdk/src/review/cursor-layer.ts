@@ -2,6 +2,12 @@ import type { CursorInfo } from "./types";
 
 const COLORS = ["#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#3b82f6"];
 
+function cursorSvg(color: string): string {
+  return `<svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 1L6.5 18L8.5 11L15.5 9L1 1Z" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+
 export class CursorLayer {
   private container: HTMLDivElement;
   private cursors = new Map<string, HTMLDivElement>();
@@ -30,16 +36,16 @@ export class CursorLayer {
       cursorEl = document.createElement("div");
       cursorEl.className = "prevuiw-cursor";
 
-      const dot = document.createElement("div");
-      dot.className = "prevuiw-cursor-dot";
-      dot.style.background = color;
+      const arrow = document.createElement("div");
+      arrow.className = "prevuiw-cursor-arrow";
+      arrow.innerHTML = cursorSvg(color);
 
       const nameTag = document.createElement("div");
       nameTag.className = "prevuiw-cursor-name";
       nameTag.style.background = color;
       nameTag.textContent = data.name;
 
-      cursorEl.appendChild(dot);
+      cursorEl.appendChild(arrow);
       cursorEl.appendChild(nameTag);
       this.container.appendChild(cursorEl);
       this.cursors.set(data.socketId, cursorEl);

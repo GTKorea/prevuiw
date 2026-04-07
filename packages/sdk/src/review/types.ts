@@ -1,13 +1,17 @@
+export type Viewport = "MOBILE_375" | "TABLET_768" | "LAPTOP_1440" | "DESKTOP_1920";
+
 export interface PrevuiwConfig {
   apiUrl: string;
   projectKey: string;
-  versionId?: string;
+  versionKey: string;
+  inviteToken: string;
 }
 
 export interface ResolvedVersion {
   versionId: string;
   projectId: string;
   versionName: string;
+  domain: string;
 }
 
 export interface CommentData {
@@ -15,9 +19,11 @@ export interface CommentData {
   content: string;
   posX: number;
   posY: number;
+  viewport: Viewport;
   cssSelector: string | null;
   pageUrl: string | null;
-  guestName: string | null;
+  reviewerName: string | null;
+  parentId: string | null;
   isResolved: boolean;
   author: { id: string; name: string; avatarUrl: string | null } | null;
   createdAt: string;

@@ -1,5 +1,4 @@
 import { io } from "socket.io-client";
-import type { CursorInfo } from "./types";
 
 type EventCallback = (...args: any[]) => void;
 
@@ -14,7 +13,9 @@ export class WsClient {
     private apiUrl: string,
     private projectKey: string,
     private versionId: string,
-    private reviewerName: string
+    private reviewerName: string,
+    private versionKey: string,
+    private inviteToken: string,
   ) {}
 
   async connect() {
@@ -22,6 +23,8 @@ export class WsClient {
       query: {
         projectKey: this.projectKey,
         versionId: this.versionId,
+        versionKey: this.versionKey,
+        inviteToken: this.inviteToken,
         name: this.reviewerName,
       },
       transports: ["polling", "websocket"],
