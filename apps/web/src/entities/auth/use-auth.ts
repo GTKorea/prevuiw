@@ -1,22 +1,16 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { useAuthStore } from "@/stores/auth-store";
-import { getToken } from "@/lib/auth";
 import { useEffect } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatarUrl: string | null;
-}
+import { api, queryKeys } from "@/shared/api";
+import { getToken } from "@/shared/lib";
+import { useAuthStore } from "./store";
+import type { User } from "@/shared/types";
 
 export function useAuth() {
   const { user, isLoading, setUser, logout } = useAuthStore();
 
   const { data, isLoading: queryLoading } = useQuery<User>({
-    queryKey: ["auth", "me"],
+    queryKey: queryKeys.auth.me(),
     queryFn: () => api.get<User>("/auth/me"),
     enabled: !!getToken(),
     retry: false,
