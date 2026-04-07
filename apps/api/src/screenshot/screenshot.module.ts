@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ScreenshotProcessor } from './screenshot.processor';
 import { ScreenshotService } from './screenshot.service';
 
 @Module({
-  providers: [ScreenshotProcessor, ScreenshotService],
+  providers: [ScreenshotService],
   exports: [ScreenshotService],
 })
 export class ScreenshotModule {}
