@@ -51,7 +51,7 @@ export class CommentService {
         },
         reactions: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
   }
 
