@@ -1,6 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
@@ -24,9 +27,14 @@ class CorsIoAdapter extends IoAdapter {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Serve local screenshot uploads
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   app.useWebSocketAdapter(new CorsIoAdapter(app));
+
+  app.use(cookieParser());
 
   app.enableCors({
     origin: true,

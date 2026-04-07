@@ -2,6 +2,7 @@ import { Controller, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { IsString, IsNotEmpty } from 'class-validator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthUser } from '@/common/types/auth';
 import { ReactionService } from './reaction.service';
 
 export class CreateReactionDto {
@@ -18,7 +19,7 @@ export class ReactionController {
   @UseGuards(JwtAuthGuard)
   toggle(
     @Param('commentId') commentId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
     @Body() dto: CreateReactionDto,
   ) {
     return this.reactionService.toggle(commentId, user.id, dto.emoji);
